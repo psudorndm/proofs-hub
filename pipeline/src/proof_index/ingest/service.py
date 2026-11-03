@@ -3,9 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
+import yaml
 from sqlalchemy import Engine, select
 
+from proof_index.classify.engine import Classifier
+from proof_index.classify.rules import load_rules
+from proof_index.classify.store import ClassificationHook
 from proof_index.clock import Clock, SystemClock
 from proof_index.config.sources import SourcesConfig, load_sources
 from proof_index.db import tables as t
@@ -13,8 +18,9 @@ from proof_index.db.repository import make_engine
 from proof_index.errors import ConfigError, InputError
 from proof_index.http.client import ProviderHttpClient
 from proof_index.http.rate_limit import Budget, LimiterRegistry
-from proof_index.ingest.hooks import PromotionHooks
+from proof_index.ingest.hooks import HookChain, PromotionHooks
 from proof_index.ingest.runner import RESUMABLE_STATES, HarvestRunner, RunSummary
+from proof_index.models.classification import load_taxonomy
 from proof_index.settings import Settings
 from proof_index.storage.factory import make_blob_store
 
@@ -59,11 +65,23 @@ class Pipeline:
         )
 
 
-def default_hooks(pipeline: Pipeline) -> PromotionHooks:
-    """Classification, identity, and event hooks (added by T07–T09)."""
-    from proof_index.ingest.hooks import NoopHooks
+def crypto_venue_keys(path: Path = Path("config/venues.yaml")) -> frozenset[str]:
+    """Venue keys whose papers carry cryptographic venue evidence (registry from T10)."""
+    if not path.is_file():
+        return frozenset()
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return frozenset(str(v["key"]) for v in data.get("venues", []) if v.get("cryptographic", False))
 
-    return NoopHooks()
+
+def classification_hook(pipeline: Pipeline) -> ClassificationHook:
+    taxonomy = load_taxonomy(Path("config/taxonomy.yaml"))
+    rules = load_rules(Path("config/relevance-rules.yaml"), taxonomy)
+    return ClassificationHook(Classifier(rules), pipeline.clock, crypto_venue_keys())
+
+
+def default_hooks(pipeline: Pipeline) -> PromotionHooks:
+    """Classification, then identity and events (T08–T09 extend the chain)."""
+    return HookChain(classification_hook(pipeline))
 
 
 def select_streams(

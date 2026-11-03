@@ -1,0 +1,216 @@
+# Deterministic relevance rules (spec section 10). Product logic, not calibrated
+# probabilities. Tune only from recorded evaluation errors and bump `version`.
+#
+# Fields: title | abstract | title_or_abstract. Patterns are static, compiled once.
+# `case_sensitive: true` is used for acronyms and tool names that collide with words.
+version: rules-v1
+provenance: >-
+  Starter policy from the implementation specification section 10.2, expanded by
+  the implementing agent (agent-provisional) with spelling variants and a few
+  phrases noted in docs/taxonomy.md. Not yet tuned on real records.
+
+rules:
+  # ---------------------------------------------------------------- ps_direct
+  - {id: PS_DIRECT_ZK_PROOF, area: proof-systems, topic: zero-knowledge, evidence_group: ps_direct,
+     pattern: '\bzero[- ]?knowledge (?:proofs?|arguments?|proof systems?|protocols?|succinct)\b'}
+  - {id: PS_DIRECT_NIZK, area: proof-systems, topic: zero-knowledge, evidence_group: ps_direct,
+     case_sensitive: true, pattern: '\b(?:NI)?ZK(?:PoK|AoK)s?\b|\bNIZKs?\b'}
+  - {id: PS_DIRECT_POK, area: proof-systems, topic: zero-knowledge, evidence_group: ps_direct,
+     pattern: '\b(?:proofs?|arguments?) of knowledge\b'}
+  - {id: PS_DIRECT_SNARK, area: proof-systems, topic: succinct-proofs, evidence_group: ps_direct,
+     pattern: '\b(?:zk[- ]?)?snarks?\b|\bsnargs?\b'}
+  - {id: PS_DIRECT_STARK, area: proof-systems, topic: succinct-proofs, evidence_group: ps_direct,
+     case_sensitive: true, pattern: '\b(?:zk-?)?STARKs?\b'}
+  - {id: PS_DIRECT_SUCCINCT_ARG, area: proof-systems, topic: succinct-proofs, evidence_group: ps_direct,
+     pattern: '\bsuccinct (?:non[- ]interactive )?(?:arguments?|proofs?)\b'}
+  - {id: PS_DIRECT_PCS, area: proof-systems, topic: commitments, evidence_group: ps_direct,
+     pattern: '\bpolynomial commitments?(?: schemes?)?\b'}
+  - {id: PS_DIRECT_IOP, area: proof-systems, topic: interactive-foundations, evidence_group: ps_direct,
+     pattern: '\binteractive oracle proofs?\b'}
+  - {id: PS_DIRECT_PCP, area: proof-systems, topic: interactive-foundations, evidence_group: ps_direct,
+     pattern: '\bprobabilistically[- ]checkable proofs?\b|\bprobabilistic checking of proofs\b'}
+  - {id: PS_DIRECT_IP, area: proof-systems, topic: interactive-foundations, evidence_group: ps_direct,
+     pattern: '\binteractive proofs?(?: systems?)?\b'}
+  - {id: PS_DIRECT_SIGMA, area: proof-systems, topic: zero-knowledge, evidence_group: ps_direct,
+     pattern: '\b(?:sigma|Σ)[- ]protocols?\b'}
+  - {id: PS_DIRECT_IN_THE_HEAD, area: proof-systems, topic: alternative-constructions,
+     evidence_group: ps_direct, pattern: '\b(?:mpc|vole)[- ]in[- ]the[- ]head\b'}
+  - {id: PS_DIRECT_RECURSIVE, area: proof-systems, topic: recursion, evidence_group: ps_direct,
+     pattern: '\brecursive(?:ly composed)? (?:proofs?|arguments?|snarks?|proof composition)\b|\bproof[- ]carrying data\b'}
+  - {id: PS_DIRECT_IVC, area: proof-systems, topic: recursion, evidence_group: ps_direct,
+     pattern: '\bincrementally verifiable computation\b'}
+
+  # ------------------------------------------------------------- ps_component
+  - {id: PS_COMP_SUMCHECK, area: proof-systems, topic: interactive-foundations,
+     evidence_group: ps_component, pattern: '\bsum[- ]?check\b'}
+  - {id: PS_COMP_GKR, area: proof-systems, topic: interactive-foundations, evidence_group: ps_component,
+     case_sensitive: true, pattern: '\bGKR\b'}
+  - {id: PS_COMP_FRI, area: proof-systems, topic: succinct-proofs, evidence_group: ps_component,
+     case_sensitive: true, pattern: '\bFRI\b'}
+  - {id: PS_COMP_LDT, area: proof-systems, topic: interactive-foundations, evidence_group: ps_component,
+     pattern: '\blow[- ]degree test(?:s|ing|ers?)?\b'}
+  - {id: PS_COMP_IPA, area: proof-systems, topic: commitments, evidence_group: ps_component,
+     pattern: '\binner[- ]product arguments?\b'}
+  - {id: PS_COMP_LOOKUP, area: proof-systems, topic: arithmetization, evidence_group: ps_component,
+     pattern: '\blookup arguments?\b'}
+  - {id: PS_COMP_ACCUMULATION, area: proof-systems, topic: recursion, evidence_group: ps_component,
+     pattern: '\baccumulation schemes?\b'}
+  - {id: PS_COMP_FOLDING, area: proof-systems, topic: recursion, evidence_group: ps_component,
+     pattern: '\bfolding schemes?\b'}
+  - {id: PS_COMP_ARITHMETIZATION, area: proof-systems, topic: arithmetization,
+     evidence_group: ps_component, pattern: '\barithmeti[sz]ations?\b'}
+  - {id: PS_COMP_R1CS, area: proof-systems, topic: arithmetization, evidence_group: ps_component,
+     pattern: '\br1cs\b|\bplonk(?:ish)?\b'}
+  - {id: PS_COMP_ZKVM, area: proof-systems, topic: proving-systems, evidence_group: ps_component,
+     pattern: '\bzk[- ]?vms?\b'}
+  - {id: PS_COMP_IVC, area: proof-systems, topic: recursion, evidence_group: ps_component,
+     case_sensitive: true, pattern: '\bIVC\b'}
+  - {id: PS_COMP_VC, area: proof-systems, topic: verifiable-computation, evidence_group: ps_component,
+     pattern: '\bverifiable (?:computation|computing)\b|\bdelegat(?:ion of|ing) computation\b'}
+
+  # ------------------------------------------------------------ crypto_context
+  - {id: CTX_CRYPTOGRAPHY, evidence_group: crypto_context,
+     pattern: '\bcryptograph(?:y|ic|ical|ically)\b|\bcryptosystems?\b'}
+  - {id: CTX_ZERO_KNOWLEDGE, evidence_group: crypto_context, pattern: '\bzero[- ]?knowledge\b'}
+  - {id: CTX_PROVER_VERIFIER, evidence_group: crypto_context,
+     pattern: '\bprovers? and (?:the )?verifiers?\b|\bverifiers? and (?:the )?provers?\b'}
+  - {id: CTX_ENCRYPTION, evidence_group: crypto_context, pattern: '\bencrypt(?:ion|ed|s|ing)?\b'}
+  - {id: CTX_SIGNATURE, evidence_group: crypto_context,
+     pattern: '\b(?:digital )?signatures?\b'}
+  - {id: CTX_KEY_EXCHANGE, evidence_group: crypto_context, pattern: '\bkey (?:exchange|agreement)\b'}
+  - {id: CTX_AUTH_PROTOCOL, evidence_group: crypto_context, pattern: '\bauthentication protocols?\b'}
+  - {id: CTX_MPC, evidence_group: crypto_context,
+     pattern: '\bsecure (?:multi[- ]?party|two[- ]party) computation\b'}
+  - {id: CTX_PCS, evidence_group: crypto_context, pattern: '\bpolynomial commitments?\b'}
+  - {id: CTX_NI_ARGUMENT, evidence_group: crypto_context, pattern: '\bnon[- ]interactive arguments?\b'}
+  - {id: CTX_PRIMITIVES, evidence_group: crypto_context,
+     pattern: '\bhash functions?\b|\bblock ciphers?\b|\bpublic[- ]key\b|\bdiscrete[- ]log(?:arithm)?\b|\belliptic[- ]curves?\b|\blattice[- ]based\b|\bpairing[- ]based\b|\bpost[- ]quantum\b'}
+
+  # ----------------------------------------------------------- security_method
+  - {id: SP_SECURITY_PROOF, area: security-proofs, topic: security-reductions,
+     evidence_group: security_method,
+     pattern: '\bsecurity proofs?\b|\bproofs? of security\b|\bsecurity reductions?\b'}
+  - {id: SP_PROVABLE, area: security-proofs, topic: security-reductions, evidence_group: security_method,
+     pattern: '\bprovabl[ey] secur(?:e|ity)\b|\bprovable security\b'}
+  - {id: SP_SIMULATION, area: security-proofs, topic: security-definitions, evidence_group: security_method,
+     pattern: '\bsimulation[- ]based (?:security|proofs?|definitions?)\b'}
+  - {id: SP_GAME_BASED, area: security-proofs, topic: security-definitions, evidence_group: security_method,
+     pattern: '\bgame[- ]based (?:security|proofs?|definitions?)\b|\bgame[- ]hopping\b'}
+  - {id: SP_UC, area: security-proofs, topic: composability, evidence_group: security_method,
+     pattern: '\buniversal(?:ly)? composab(?:le|ility)\b'}
+  - {id: SP_COMP_SOUNDNESS, area: security-proofs, topic: computational-soundness,
+     evidence_group: security_method, pattern: '\bcomputational soundness\b'}
+  - {id: SP_ROM, area: security-proofs, topic: security-definitions, evidence_group: security_method,
+     pattern: '\brandom[- ]oracle model\b|\brandom oracles?\b'}
+  - {id: SP_QROM, area: security-proofs, topic: quantum-security, evidence_group: security_method,
+     pattern: '\bquantum random[- ]oracles?(?: model)?\b|\bqrom\b'}
+  - {id: SP_TIGHT, area: security-proofs, topic: security-reductions, evidence_group: security_method,
+     pattern: '\btight(?:ly)?[- ]secure\b|\btight (?:security|reductions?)\b'}
+  - {id: SP_CRYPTANALYSIS, area: security-proofs, topic: cryptanalysis, evidence_group: security_method,
+     pattern: '\bcryptanaly(?:sis|tic|ses)\b'}
+  - {id: SP_ATTACKS, area: security-proofs, topic: cryptanalysis, evidence_group: security_method,
+     pattern: '\b(?:forgery|key[- ]recovery|chosen[- ]ciphertext|side[- ]channel|related[- ]key) attacks?\b'}
+  - {id: SP_DEFINITIONS, area: security-proofs, topic: security-definitions,
+     evidence_group: security_method,
+     pattern: '\bsecurity (?:models?|definitions?|notions?)\b'}
+  - {id: SP_NOTIONS, area: security-proofs, topic: security-definitions, evidence_group: security_method,
+     case_sensitive: true, pattern: '\b(?:IND|EUF|SUF|INT)-(?:CCA2?|CPA|CMA|CTXT|PTXT)\b'}
+  - {id: SP_ANALYSIS, area: security-proofs, topic: protocol-analysis, evidence_group: security_method,
+     pattern: '\bsecurity analysis\b|\banaly[sz]ing the security\b|\bwe prove (?:that )?(?:\w+ ){0,4}(?:is |are )?secure\b'}
+
+  # ----------------------------------------------------------- protocol_object
+  - {id: OBJ_KEM, evidence_group: protocol_object, case_sensitive: true, pattern: '\bKEMs?\b'}
+  - {id: OBJ_KEY_ENCAPSULATION, evidence_group: protocol_object, pattern: '\bkey[- ]encapsulation\b'}
+  - {id: OBJ_ENCRYPTION, evidence_group: protocol_object,
+     pattern: '\b(?:public[- ]key |symmetric |authenticated |functional |homomorphic |identity[- ]based )?encryption(?: schemes?)?\b'}
+  - {id: OBJ_SIGNATURE, evidence_group: protocol_object,
+     pattern: '\bdigital signatures?\b|\bsignature schemes?\b|\b(?:blind|ring|group|threshold|aggregate) signatures?\b'}
+  - {id: OBJ_AKE, evidence_group: protocol_object,
+     pattern: '\bauthenticated key (?:exchange|agreement)\b|\bkey exchange\b'}
+  - {id: OBJ_AUTH, evidence_group: protocol_object, pattern: '\bauthentication protocols?\b'}
+  - {id: OBJ_OT, evidence_group: protocol_object, pattern: '\boblivious transfers?\b'}
+  - {id: OBJ_MPC, evidence_group: protocol_object,
+     pattern: '\bmulti[- ]?party computation\b|\bmpc protocols?\b'}
+  - {id: OBJ_PRIVACY, evidence_group: protocol_object, pattern: '\bprivacy[- ]preserving protocols?\b'}
+  - {id: OBJ_COMMITMENT, evidence_group: protocol_object, pattern: '\bcommitment schemes?\b'}
+  - {id: OBJ_NAMED_PROTOCOLS, evidence_group: protocol_object, case_sensitive: true,
+     pattern: '\bTLS(?: ?1\.[0-3])?\b|\bSSH\b|\bIPsec\b|\bSignal protocol\b|\bNoise protocol\b|\bKEMTLS\b|\bQUIC\b|\bWireGuard\b|\bKerberos\b|\b5G[- ]AKA\b|\bEMV\b'}
+
+  # ------------------------------------------------------------- formal_method
+  - {id: FV_FORMAL_VERIFICATION, area: formal-verification, topic: formal-protocol-verification,
+     evidence_group: formal_method, pattern: '\bformal(?:ly)? verif(?:ication|ied|y|ying)\b'}
+  - {id: FV_MECHANIZED, area: formal-verification, topic: mechanized-proofs, evidence_group: formal_method,
+     pattern: '\bmechani[sz]ed (?:security )?(?:proofs?|verification|reasoning)\b|\bmachine[- ]checked (?:proofs?|security proofs?)\b'}
+  - {id: FV_VERIFIED_IMPL, area: formal-verification, topic: verified-implementations,
+     evidence_group: formal_method, pattern: '\bverified (?:implementations?|compil(?:er|ation)|cryptographic (?:code|libraries?))\b'}
+  - {id: FV_SYMBOLIC, area: formal-verification, topic: formal-protocol-verification,
+     evidence_group: formal_method,
+     pattern: '\bsymbolic (?:protocol )?(?:analysis|models?|verification|security)\b|\bdolev[- ]yao\b'}
+  - {id: FV_COMPUTATIONAL, area: formal-verification, topic: computational-soundness,
+     evidence_group: formal_method, pattern: '\bcomputational (?:protocol )?verification\b|\bcomputationally sound\b'}
+  - {id: FV_PROOF_ASSISTANT, area: formal-verification, topic: mechanized-proofs,
+     evidence_group: formal_method, pattern: '\bproof assistants?\b|\binteractive theorem provers?\b'}
+  - {id: FV_FORMAL_ANALYSIS, area: formal-verification, topic: formal-protocol-verification,
+     evidence_group: formal_method, pattern: '\bformal (?:security )?(?:analysis|methods?|models?|proofs?)\b'}
+
+  # --------------------------------------------------------------- formal_tool
+  - {id: FT_PROTOCOL_TOOLS, area: formal-verification, topic: formal-protocol-verification,
+     evidence_group: formal_tool, case_sensitive: true,
+     pattern: '\bTamarin(?: prover)?\b|\bProVerif\b|\bCryptoVerif\b|\bDeepSec\b|\bMaude-NPA\b|\bSquirrel(?: prover)?\b|\bVerifpal\b'}
+  - {id: FT_PROOF_TOOLS, area: formal-verification, topic: mechanized-proofs, evidence_group: formal_tool,
+     case_sensitive: true,
+     pattern: '\bEasyCrypt\b|\bCoq\b|\bRocq\b|\bIsabelle(?:/HOL)?\b|\bSSProve\b|\bCertiCrypt\b|\bLean (?:4|theorem prover|prover|proof assistant)\b|\bin Lean\b|\bLean proofs?\b|\bMathlib\b'}
+  - {id: FT_IMPL_TOOLS, area: formal-verification, topic: verified-implementations,
+     evidence_group: formal_tool, case_sensitive: true,
+     pattern: '\bF\*|\bHACL\*|\bJasmin\b|\bhacspec\b|\bCryptoline\b|\bVale\b|\bFiat[- ]Crypto\b'}
+
+  # ------------------------------------------------------------ ambiguous_only
+  # Generic tokens. Alone they never force review; in a title alongside
+  # cryptographic evidence they are a weak cue (review).
+  - {id: AMB_PROOF, evidence_group: ambiguous_only, field: title, pattern: '\bproofs?\b'}
+  - {id: AMB_ARGUMENT, evidence_group: ambiguous_only, field: title, pattern: '\barguments?\b'}
+  - {id: AMB_AIR, evidence_group: ambiguous_only, case_sensitive: true, pattern: '\bAIR\b'}
+  - {id: AMB_ACRONYMS, evidence_group: ambiguous_only, case_sensitive: true,
+     pattern: '\b(?:PCS|IPA|IOP|PCP|ZK|MPC|UC|RO|IP)s?\b'}
+  - {id: AMB_NOVA, evidence_group: ambiguous_only, case_sensitive: true, pattern: '\bNova\b'}
+  - {id: AMB_SCHEME_NAMES, evidence_group: ambiguous_only, case_sensitive: true,
+     pattern: '\bHalo(?:2)?\b|\bSpartan\b'}
+  - {id: AMB_FOLDING, evidence_group: ambiguous_only, pattern: '\bfolding\b'}
+  - {id: AMB_SECURITY, evidence_group: ambiguous_only, field: title, pattern: '\bsecur(?:e|ity)\b'}
+  - {id: AMB_VERIFICATION, evidence_group: ambiguous_only, field: title, pattern: '\bverif(?:ication|ying|ied|y)\b'}
+  - {id: AMB_THEOREM, evidence_group: ambiguous_only, field: title, pattern: '\btheorems?\b'}
+
+# Contradictory contexts suppress ambiguous-name matches only. When an area is
+# otherwise supported, their presence turns `include` into `review` (conflicting cues).
+contradictory_contexts:
+  - {id: CTX_NEG_ASTRONOMY, suppresses: [AMB_NOVA],
+     pattern: '\b(?:galax(?:y|ies)|supernova(?:e|s)?|stellar|telescopes?|nebula|white dwarfs?|photometr(?:y|ic)|light curves?|astronom(?:y|ical))\b'}
+  - {id: CTX_NEG_AERODYNAMICS, suppresses: [AMB_AIR],
+     pattern: '\b(?:aerodynamics?|airflow|airfoils?|wind tunnels?|air quality|air pollution|turbulen(?:ce|t))\b'}
+  - {id: CTX_NEG_PROTEIN, suppresses: [AMB_FOLDING],
+     pattern: '\b(?:proteins?|amino acids?|molecular dynamics|polypeptides?)\b'}
+
+# Title-level "cryptanalysis of <named scheme>" (spec 10.3 step 3).
+cryptanalysis_allowlist:
+  provenance: >-
+    Widely deployed primitives and NIST standardization/competition schemes,
+    compiled by the implementing agent for rules-v1 (agent-provisional).
+  pattern: '\bcryptanaly(?:sis|ses|zing) of (?:the |reduced[- ]round |round[- ]reduced )*(?P<name>[A-Za-z0-9][A-Za-z0-9+\-]*)'
+  schemes: [AES, Rijndael, DES, 3DES, SHA-1, SHA-2, SHA-256, SHA-512, SHA-3, Keccak, MD4, MD5,
+            RSA, ECDSA, EdDSA, DSA, ElGamal, Kyber, ML-KEM, Dilithium, ML-DSA, Falcon, SPHINCS+,
+            SLH-DSA, HQC, BIKE, McEliece, NTRU, NTRUEncrypt, SIKE, SIDH, Rainbow, GeMSS, Picnic,
+            ChaCha, ChaCha20, Salsa20, Poly1305, Ascon, GIFT, PRESENT, SIMON, SPECK, Grain,
+            Trivium, Camellia, Serpent, Twofish, Skinny, Romulus, Elephant, Photon, Xoodyak,
+            Poseidon, Rescue, MiMC, Griffin, Anemoi, GOST, Streebog, SM3, SM4, ARIA, LEA]
+
+contributions:
+  - {id: CONTRIB_ATTACK, contribution: analysis-attack,
+     pattern: '\b(?:attacks?|cryptanaly(?:sis|tic)|breaking|forger(?:y|ies)|key[- ]recovery|distinguishers?|counterexamples?|flaws?|vulnerabilit(?:y|ies))\b'}
+  - {id: CONTRIB_CONSTRUCTION, contribution: construction-theory,
+     pattern: '\bwe (?:construct|propose|present|introduce|give|design) (?:a |an |the |new |novel )?(?:\w+[- ]?){0,4}(?:schemes?|protocols?|constructions?|proof systems?|arguments?|frameworks?|compilers?)\b|\bwe prove\b|\bsecurity theorems?\b|\blower bounds?\b|\bimpossibility\b|\bcharacteri[sz]ation of\b'}
+  - {id: CONTRIB_IMPLEMENTATION, contribution: implementation-optimization,
+     pattern: '\b(?:implementations?|accelerat(?:or|ors|ion|ing)|gpus?|fpgas?|asics?|hardware|benchmark(?:s|ing)?|optimi[sz](?:ation|ations|ed|ing)|speed[- ]?ups?)\b|\bcompilers?\b'}
+  - {id: CONTRIB_APPLICATION, contribution: application,
+     pattern: '\bapplications? to\b|\bdeploy(?:ed|ment)\b|\bblockchains?\b|\bcryptocurrenc(?:y|ies)\b|\be[- ]?voting\b|\banonymous credentials?\b|\bsmart contracts?\b|\brollups?\b'}
+  - {id: CONTRIB_SURVEY, contribution: survey-tutorial, field: title, case_sensitive: true,
+     pattern: '\b(?:[Ss]urvey|SoK|[Tt]utorial|[Ss]ystemati[sz]ation of [Kk]nowledge|[Oo]verview)\b'}

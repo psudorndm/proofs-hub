@@ -170,3 +170,27 @@ changed stream config refuses reuse; incremental `from` = watermark − 2 days;
 `test_older_backfill_cannot_replace_newer_current_observation`; equal ordering +
 different content → `conflict`; `test_undated_A_B_A_reversion_is_retained_once`;
 newer version replaces current.
+
+## T07 — Classification (2026-11-03)
+
+```text
+$ make test-db                 -> 220 passed
+$ uv run ruff check; uv run mypy (51 files) -> clean
+$ uv run proof-index classify --changed       -> {"examined": 0, ...}  (local catalog is empty)
+$ uv run proof-index classify --all --rules-version rules-v9
+    error[invalid_input]: --rules-version rules-v9 does not match the configured rules file (rules-v1)
+```
+
+Synthetic case results (`tests/fixtures/synthetic/cases.json`, rules-v1):
+F01/F02/F03/F10/F11/F12/F14 include proof-systems; F04 include security-proofs;
+F05 include formal-verification; F13/F16 include proof-systems + security-proofs;
+F06, F07, F15 exclude; F08 review. These are synthetic test cases, not an
+evaluation of real-record precision or recall (T18).
+Behavior tests: `test_security_proof_and_formal_crypto_examples_are_in_scope`,
+`test_missing_abstract_is_not_automatic_exclusion`, distinct-span independence,
+ambiguous tokens alone do not force review, contradictory contexts suppress only
+ambiguous names, formal tools need crypto context, named-cryptanalysis allowlist,
+uppercase-only STARK, contributions (including "no fabricated type"), normalized
+offsets, override precedence, taxonomy validation of rule topics. PostgreSQL tests:
+promotion hook writes classification rows (tombstones skipped); `--changed` fills
+only missing rows; `--all` recomputation is deterministic.

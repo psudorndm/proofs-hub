@@ -1,6 +1,6 @@
 # Implementation status
-Current task: T07
-Last completed task: T06
+Current task: T08
+Last completed task: T07
 Confirmed decisions: broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
 
 Nothing in this repository is a completed production project yet. No backfill has
@@ -15,7 +15,7 @@ run, no live provider data has been ingested, and no evaluation has been perform
 | T04 | done | `storage/{base,local,s3,factory}.py`, `http/{client,rate_limit,errors}.py`, `db/locks.py`; 146 tests (verification report T04) | S3 backend tested only with botocore Stubber; no real bucket |
 | T05 | partial | Adapters `eprint`, `arxiv_oai`, `arxiv_atom`; OAI protocol layer; `config/sources.yaml`; `sources verify --bounded` (ran: proxy 403, reports written); `docs/source-contracts.md`; 21 parser tests + verify test on synthetic fixtures | **Live verification blocked**: all mappings are assumptions; ePrint date/version semantics and arXiv set list unresolved |
 | T06 | done | `ingest/{runner,staging,promote,reconcile,hooks,service}.py`, `sync`/`backfill` CLI, migration 0002; 19 PostgreSQL recovery tests (verification report T06) | Classification/identity/event hooks are wired in T07–T09 |
-| T07 | not_started | — | — |
+| T07 | done | `config/relevance-rules.yaml` (rules-v1), `classify/{rules,engine,store}.py`, promotion hook, `classify --changed/--all`; synthetic F-cases + 32 tests (verification report T07) | Rules untuned on real records (T18); venue registry arrives with T10 |
 | T08 | not_started | — | — |
 | T09 | not_started | — | — |
 | T10 | not_started | — | — |
@@ -41,8 +41,8 @@ run, no live provider data has been ingested, and no evaluation has been perform
 - PostgreSQL 17.11 (`postgres:17` Docker image); Docker 29.9.2 with Compose v5.6.1
 
 ## Next actions
-1. T07: `config/relevance-rules.yaml` (rules-v1), rule loader/compiler, evidence-group decision engine, per-source classification rows via a promotion hook, `classify --changed/--all`.
-2. T07 gate: F01/F04/F05 included; F06/F07 excluded; F08 review; F15 not auto-included; missing abstract not auto-excluded.
+1. T08: identity resolution (explicit IDs, DOI, exact title, conservative title+author, similarity → review), work creation, canonical projection with per-field provenance, work-level aggregation; identity promotion hook.
+2. T08 gate: F01/F02 merge; F10 does not; identical rerun preserves IDs; shared proceedings DOI does not merge.
 3. When provider access exists: `sources verify --source eprint --bounded --capture-fixtures tests/fixtures/eprint` then reconcile `docs/source-contracts.md`.
 
 ## External blockers

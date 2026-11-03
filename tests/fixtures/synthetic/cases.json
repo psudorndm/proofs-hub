@@ -1,0 +1,657 @@
+{
+  "notice": "SYNTHETIC test cases (spec section 18.1); not bibliographic claims.",
+  "frozen_now": "2026-11-03T12:00:00Z",
+  "cases": [
+    {
+      "case": "F01",
+      "expect": {
+        "decision": "include",
+        "areas": [
+          "proof-systems"
+        ],
+        "topics_include": [
+          "zero-knowledge"
+        ]
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "2020/7",
+        "title": "Zero-knowledge proofs for private arithmetic computations",
+        "authors": [
+          {
+            "display_name": "Alice Example"
+          },
+          {
+            "display_name": "Bob Example"
+          }
+        ],
+        "abstract": "We construct a zero-knowledge proof system for arithmetic circuits and prove its soundness under a standard cryptographic assumption.",
+        "published": {
+          "year": 2020,
+          "month": 1,
+          "day": 3,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [
+          {
+            "kind": "landing",
+            "url": "https://eprint.iacr.org/2020/007",
+            "origin": "source_metadata"
+          }
+        ],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F02",
+      "expect": {
+        "decision": "include",
+        "areas": [
+          "proof-systems"
+        ],
+        "same_work_as": "F01"
+      },
+      "record": {
+        "source": "arxiv",
+        "source_id": "2001.00007",
+        "title": "Zero-knowledge proofs for private arithmetic computations",
+        "authors": [
+          {
+            "display_name": "Alice Example"
+          },
+          {
+            "display_name": "Bob Example"
+          }
+        ],
+        "abstract": "We construct a zero-knowledge proof system for arithmetic circuits and prove its soundness under a standard cryptographic assumption.",
+        "published": {
+          "year": 2020,
+          "month": 1,
+          "day": 5,
+          "precision": "day"
+        },
+        "source_modified_at": "2020-01-05T18:00:00Z",
+        "harvest_datestamp": null,
+        "source_version": "v1",
+        "doi": null,
+        "identifiers": {
+          "eprint": [
+            "2020/7"
+          ]
+        },
+        "source_categories": [
+          "cs.CR"
+        ],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F03",
+      "expect": {
+        "decision": "include",
+        "areas": [
+          "proof-systems"
+        ],
+        "same_work_as": "F01",
+        "revision_of": "F02"
+      },
+      "record": {
+        "source": "arxiv",
+        "source_id": "2001.00007",
+        "title": "Zero-knowledge proofs for private arithmetic computations",
+        "authors": [
+          {
+            "display_name": "Alice Example"
+          },
+          {
+            "display_name": "Bob Example"
+          }
+        ],
+        "abstract": "We construct a zero-knowledge proof system for arithmetic circuits and prove its soundness under a standard cryptographic assumption. This version adds an implementation.",
+        "published": {
+          "year": 2020,
+          "month": 1,
+          "day": 5,
+          "precision": "day"
+        },
+        "source_modified_at": "2020-03-01T10:00:00Z",
+        "harvest_datestamp": null,
+        "source_version": "v2",
+        "doi": null,
+        "identifiers": {
+          "eprint": [
+            "2020/7"
+          ]
+        },
+        "source_categories": [
+          "cs.CR"
+        ],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F04",
+      "expect": {
+        "decision": "include",
+        "areas": [
+          "security-proofs"
+        ]
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "2021/42",
+        "title": "Security proofs for key encapsulation mechanisms",
+        "authors": [
+          {
+            "display_name": "Dana Example"
+          }
+        ],
+        "abstract": "We give tight security reductions for KEMs built from public-key encryption in the random oracle model.",
+        "published": {
+          "year": 2021,
+          "month": 1,
+          "day": 20,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F05",
+      "expect": {
+        "decision": "include",
+        "areas_include": [
+          "formal-verification"
+        ]
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "2021/100",
+        "title": "Formal verification of authentication protocols with Tamarin",
+        "authors": [
+          {
+            "display_name": "Erin Example"
+          }
+        ],
+        "abstract": "We use the Tamarin prover to analyse cryptographic authentication protocols in the symbolic model.",
+        "published": {
+          "year": 2021,
+          "month": 2,
+          "day": 1,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F06",
+      "expect": {
+        "decision": "exclude"
+      },
+      "record": {
+        "source": "arxiv",
+        "source_id": "2105.00001",
+        "title": "Nova observations in nearby galaxies",
+        "authors": [
+          {
+            "display_name": "Fay Astro"
+          }
+        ],
+        "abstract": "We report photometric light curves of a classical nova in two nearby galaxies.",
+        "published": {
+          "year": 2021,
+          "month": 5,
+          "day": 1,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [
+          "astro-ph.SR"
+        ],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F07",
+      "expect": {
+        "decision": "exclude"
+      },
+      "record": {
+        "source": "arxiv",
+        "source_id": "2106.00002",
+        "title": "Lean proofs of elementary number theoretic identities",
+        "authors": [
+          {
+            "display_name": "Gus Math"
+          }
+        ],
+        "abstract": "We formalize classical identities about divisors in Lean 4 using Mathlib.",
+        "published": {
+          "year": 2021,
+          "month": 6,
+          "day": 2,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [
+          "math.NT"
+        ],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F08",
+      "expect": {
+        "decision": "review"
+      },
+      "record": {
+        "source": "dblp",
+        "source_id": "conf/synthcrypto/Generic20",
+        "title": "A generic verification approach",
+        "authors": [
+          {
+            "display_name": "Hal Example"
+          }
+        ],
+        "abstract": null,
+        "published": {
+          "year": 2020,
+          "month": null,
+          "day": null,
+          "precision": "year"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": "synthcrypto",
+        "venue_name": "Synthetic Cryptology Conference",
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F09",
+      "expect": {
+        "curated": true,
+        "foundational": true
+      },
+      "record": {
+        "source": "curated",
+        "source_id": "curated:synthetic-zk-1985",
+        "title": "A synthetic foundational interactive proof record",
+        "authors": [
+          {
+            "display_name": "Ida Historic"
+          },
+          {
+            "display_name": "Jon Historic"
+          }
+        ],
+        "abstract": null,
+        "published": {
+          "year": 1985,
+          "month": null,
+          "day": null,
+          "precision": "year"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "title": "SYNTHETIC verified evidence field (fixture)"
+        }
+      }
+    },
+    {
+      "case": "F10",
+      "expect": {
+        "decision": "include",
+        "distinct_work_from": "F01"
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "2020/9",
+        "title": "Zero-knowledge proofs for private arithmetic computation",
+        "authors": [
+          {
+            "display_name": "Kim Other"
+          },
+          {
+            "display_name": "Lou Other"
+          }
+        ],
+        "abstract": "We construct a zero-knowledge proof system for arithmetic circuits and prove its soundness under a standard cryptographic assumption.",
+        "published": {
+          "year": 2020,
+          "month": 1,
+          "day": 9,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": "10.9999/synthetic.f10",
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F11",
+      "expect": {
+        "decision": "include",
+        "unsafe_text": true
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "2022/1",
+        "title": "<script>alert('x')</script> Zero-knowledge proofs & <b>tags</b>",
+        "authors": [
+          {
+            "display_name": "Mia \"Quote\" Example"
+          }
+        ],
+        "abstract": "Abstract with <img src=x onerror=alert(1)> markup and a zero-knowledge proof.",
+        "published": {
+          "year": 2022,
+          "month": 1,
+          "day": 4,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F12",
+      "expect": {
+        "decision": "include",
+        "unknown_date": true
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "2023/5",
+        "title": "Succinct arguments for batch statements",
+        "authors": [
+          {
+            "display_name": "Ned Example"
+          }
+        ],
+        "abstract": "A succinct argument for batches of NP statements from collision-resistant hash functions.",
+        "published": {
+          "year": null,
+          "month": null,
+          "day": null,
+          "precision": "unknown"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F13",
+      "expect": {
+        "decision": "include",
+        "areas": [
+          "proof-systems",
+          "security-proofs"
+        ]
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "2023/6",
+        "title": "Zero-knowledge proofs with tight security reductions for signature schemes",
+        "authors": [
+          {
+            "display_name": "Oli Example"
+          }
+        ],
+        "abstract": "We prove tight security for signature schemes built from Sigma protocols.",
+        "published": {
+          "year": 2026,
+          "month": 10,
+          "day": 30,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F14",
+      "expect": {
+        "decision": "include",
+        "old_first_seen_today": true
+      },
+      "record": {
+        "source": "eprint",
+        "source_id": "1999/1",
+        "title": "Zero-knowledge arguments from one-way functions",
+        "authors": [
+          {
+            "display_name": "Pat Early"
+          }
+        ],
+        "abstract": "A zero-knowledge argument construction from any one-way function.",
+        "published": {
+          "year": 1999,
+          "month": 1,
+          "day": 5,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F15",
+      "expect": {
+        "decision": "exclude"
+      },
+      "record": {
+        "source": "arxiv",
+        "source_id": "2107.00003",
+        "title": "Verifying compiler optimizations in Coq",
+        "authors": [
+          {
+            "display_name": "Quinn PL"
+          }
+        ],
+        "abstract": "We verify loop optimizations of a functional language compiler using the Coq proof assistant.",
+        "published": {
+          "year": 2021,
+          "month": 7,
+          "day": 3,
+          "precision": "day"
+        },
+        "source_modified_at": null,
+        "harvest_datestamp": null,
+        "source_version": null,
+        "doi": null,
+        "identifiers": {},
+        "source_categories": [
+          "cs.PL"
+        ],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "active",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    },
+    {
+      "case": "F16",
+      "expect": {
+        "decision": "include",
+        "same_work_as": "F13",
+        "withdrawn_source": true
+      },
+      "record": {
+        "source": "arxiv",
+        "source_id": "2301.00010",
+        "title": "Zero-knowledge proofs with tight security reductions for signature schemes",
+        "authors": [
+          {
+            "display_name": "Oli Example"
+          }
+        ],
+        "abstract": "We prove tight security for signature schemes built from Sigma protocols.",
+        "published": {
+          "year": 2026,
+          "month": 10,
+          "day": 30,
+          "precision": "day"
+        },
+        "source_modified_at": "2026-11-01T00:00:00Z",
+        "harvest_datestamp": null,
+        "source_version": "v2",
+        "doi": null,
+        "identifiers": {
+          "eprint": [
+            "2023/6"
+          ]
+        },
+        "source_categories": [],
+        "venue_key": null,
+        "venue_name": null,
+        "links": [],
+        "status": "withdrawn",
+        "evidence": {
+          "synthetic": "tests/fixtures/synthetic/cases.json"
+        }
+      }
+    }
+  ]
+}

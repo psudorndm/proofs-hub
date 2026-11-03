@@ -251,6 +251,50 @@ def backfill(
     _run_streams(source, ("bootstrap", "supplemental"), stream, "backfill", max_minutes, resume)
 
 
+@app.command()
+@handle_errors
+def classify(
+    changed: bool = typer.Option(False, "--changed", help="Classify records lacking a row."),
+    all_records: bool = typer.Option(False, "--all", help="Recompute every current record."),
+    rules_version: str | None = typer.Option(None, "--rules-version"),
+) -> None:
+    """Classify current source records with the configured rules version."""
+    from proof_index.classify.store import classify_current
+    from proof_index.db.locks import CATALOG_WRITER, advisory_lock
+    from proof_index.errors import InputError
+    from proof_index.ingest.service import Pipeline, classification_hook
+
+    if changed == all_records:
+        raise InputError("pass exactly one of --changed or --all")
+    pipeline = Pipeline.from_settings(load_settings())
+    hook = classification_hook(pipeline)
+    if all_records and rules_version is None:
+        raise InputError("--all requires --rules-version")
+    if rules_version is not None and rules_version != hook.classifier.version:
+        raise InputError(
+            f"--rules-version {rules_version} does not match the configured rules file "
+            f"({hook.classifier.version})"
+        )
+    with advisory_lock(pipeline.engine, CATALOG_WRITER):
+        report = classify_current(pipeline.engine, hook, only_missing=changed)
+    emit(
+        {
+            "command": "classify",
+            "rules_version": report.rules_version,
+            "examined": report.examined,
+            "classified": report.classified,
+            "unchanged": report.unchanged,
+            "decisions": report.decisions,
+            "nondeterministic_mismatches": report.mismatched,
+        },
+        True,
+    )
+    if report.mismatched:
+        from proof_index.errors import DataValidationError
+
+        raise DataValidationError(f"{len(report.mismatched)} stored classifications differ")
+
+
 @app.callback()
 def _root(
     version: bool = typer.Option(False, "--version", help="Print the version and exit."),
