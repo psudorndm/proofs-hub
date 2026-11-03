@@ -115,6 +115,8 @@ harvest_runs = Table(
     Column("reported_total", BigInteger, nullable=True),
     # Incremented when an expired cursor forces a replay of the run's fixed window.
     Column("cursor_epoch", Integer, nullable=False, server_default=text("0")),
+    # Fixed request parameters for the run (e.g. the planned DOI list), kept for resume.
+    Column("request_params", JSONB(none_as_null=True), nullable=True),
     CheckConstraint(_in("mode", RUN_MODES), name="mode"),
     CheckConstraint(_in("state", RUN_STATES), name="state"),
     CheckConstraint(

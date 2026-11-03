@@ -1,0 +1,3 @@
+<!-- SYNTHETIC FIXTURE: a minimal stand-in for dblp.dtd defining two entities. Not the official DTD. -->
+<!ENTITY uuml "&#252;">
+<!ENTITY eacute "&#233;">

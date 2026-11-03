@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import os
+import shutil
 import tempfile
 from pathlib import Path
 
 from proof_index.errors import StorageError
 from proof_index.hashing import sha256_hex
-from proof_index.storage.base import BlobRef, validate_key, verify_body
+from proof_index.storage.base import BlobRef, sha256_file, validate_key, verify_body
 
 
 class LocalBlobStore:
@@ -48,6 +49,33 @@ class LocalBlobStore:
         except OSError as exc:
             raise StorageError(f"could not write blob {key!r} ({type(exc).__name__})") from exc
         return BlobRef(key, sha256, len(body), created=True)
+
+    def put_file_if_absent(self, key: str, path: Path, sha256: str) -> BlobRef:
+        """Copy a large file into the store without loading it into memory."""
+        actual, size = sha256_file(path)
+        if actual != sha256:
+            raise StorageError("file hash mismatch")
+        target = self._path(key)
+        if target.exists():
+            existing, existing_size = sha256_file(target)
+            if existing != sha256:
+                raise StorageError(f"blob {key!r} already exists with different content")
+            return BlobRef(key, sha256, existing_size, created=False)
+        try:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            fd, tmp = tempfile.mkstemp(dir=target.parent, prefix=".tmp-")
+            os.close(fd)
+            try:
+                shutil.copyfile(path, tmp)
+                try:
+                    os.link(tmp, target)
+                except FileExistsError:
+                    return self.put_file_if_absent(key, path, sha256)
+            finally:
+                Path(tmp).unlink(missing_ok=True)
+        except OSError as exc:
+            raise StorageError(f"could not store file blob {key!r} ({type(exc).__name__})") from exc
+        return BlobRef(key, sha256, size, created=True)
 
     def get(self, key: str) -> bytes:
         path = self._path(key)

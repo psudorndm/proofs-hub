@@ -246,9 +246,99 @@ def backfill(
     max_minutes: float = typer.Option(
         45, "--max-minutes", help="Execution bound for this slice; never a coverage cutoff."
     ),
+    dump: Path | None = typer.Option(None, "--dump", help="DBLP: local dblp.xml(.gz) snapshot."),
+    dtd: Path | None = typer.Option(None, "--dtd", help="DBLP: local copy of dblp.dtd."),
+    huge_tree: bool = typer.Option(False, "--huge-tree", help="DBLP: lift libxml2 size limits."),
 ) -> None:
     """Resumable historical import. A bounded slice exits 0 with complete:false."""
-    _run_streams(source, ("bootstrap", "supplemental"), stream, "backfill", max_minutes, resume)
+    if source != "dblp":
+        _run_streams(source, ("bootstrap", "supplemental"), stream, "backfill", max_minutes, resume)
+        return
+    from proof_index.errors import InputError
+    from proof_index.http.rate_limit import Budget
+    from proof_index.ingest.historical import import_dblp_dump
+    from proof_index.ingest.service import Pipeline, classification_hook
+
+    if dump is None:
+        raise InputError(
+            "DBLP backfill needs --dump (download the current release from "
+            "https://dblp.org/xml/release/ and pass the file) and usually --dtd"
+        )
+    pipeline = Pipeline.from_settings(load_settings())
+    from proof_index.storage.factory import make_blob_store
+
+    summary = import_dblp_dump(
+        pipeline.runner(),
+        make_blob_store(pipeline.settings),
+        classification_hook(pipeline).classifier,
+        dump,
+        dtd=dtd,
+        budget=Budget(max_minutes * 60),
+        huge_tree=huge_tree,
+    )
+    emit(
+        {
+            "command": "backfill",
+            "source": "dblp",
+            "complete": summary.complete,
+            "streams": [summary.to_json()],
+        },
+        True,
+    )
+    if summary.exit_code:
+        raise typer.Exit(code=summary.exit_code)
+
+
+@app.command("import-curated")
+@handle_errors
+def import_curated_cmd(
+    path: Path = typer.Argument(..., help="curation/foundations.jsonl"),
+) -> None:
+    """Validate and import the curated foundational collection."""
+    from proof_index.http.rate_limit import Budget
+    from proof_index.ingest.historical import import_curated
+    from proof_index.storage.factory import make_blob_store
+
+    pipeline, service = _curation_service()
+    result = import_curated(
+        pipeline.runner(),
+        make_blob_store(pipeline.settings),
+        service,
+        path,
+        taxonomy=service.taxonomy,
+        budget=Budget(None),
+    )
+    emit({"command": "import-curated", **result}, True)
+    if result["run"]["exit_code"]:
+        raise typer.Exit(code=result["run"]["exit_code"])
+
+
+@app.command("enrich-dois")
+@handle_errors
+def enrich_dois_cmd(
+    max_records: int = typer.Option(500, "--max-records", min=1, help="DOIs planned per run."),
+    max_minutes: float | None = typer.Option(None, "--max-minutes"),
+    mailto: str | None = typer.Option(
+        None, "--mailto", help="Contact sent to Crossref's polite pool (opt-in; never implicit)."
+    ),
+) -> None:
+    """Enrich known works with Crossref metadata for their DOIs (bounded, resumable)."""
+    from proof_index.http.rate_limit import Budget
+    from proof_index.ingest.historical import enrich_dois
+    from proof_index.ingest.service import Pipeline
+
+    pipeline = Pipeline.from_settings(load_settings())
+    result = enrich_dois(
+        pipeline.runner(),
+        pipeline.engine,
+        max_records=max_records,
+        budget=Budget(max_minutes * 60 if max_minutes else None),
+        mailto=mailto,
+        clock=pipeline.clock,
+    )
+    emit({"command": "enrich-dois", **result}, True)
+    if result.get("run") and result["run"]["exit_code"]:
+        raise typer.Exit(code=result["run"]["exit_code"])
 
 
 @app.command()

@@ -113,6 +113,63 @@ date-partitioned stream version is then required.
 Atom and OAI records share one source identity (`arxiv`, base id). The stream that
 produced each observation is stored on the observation envelope (T06).
 
-## DBLP, Crossref, curated
+## DBLP dump (`adapters/dblp.py`, parser `dblp-xml-v1`)
 
-Mappings are added with T10.
+Input: one official dump snapshot (`dblp.xml.gz` from https://dblp.org/xml/release/)
+plus its `dblp.dtd`, passed as local files (`backfill --source dblp --dump --dtd`).
+Not downloaded or processed in this environment (host blocked).
+
+| Normalized field | Path | Status |
+|---|---|---|
+| record types | `article`, `inproceedings`, `incollection` kept; `proceedings`, `book`, `www`, theses, `data` counted as filtered | Assumption |
+| `source_id` | `@key` (exact DBLP key) | Assumption |
+| `title` | `title` with inline markup flattened; one trailing period removed | Assumption |
+| `authors` | ordered `author`; `editor` never used; trailing 4-digit disambiguators removed | Assumption |
+| `published` | `year` (year precision only) | Assumption |
+| `source_modified_at` | `@mdate` | Assumption |
+| `venue_key` / `venue_name` | key prefix (e.g. `conf/crypto`) / `journal` or `booktitle` | Assumption |
+| `doi` | first `ee` resolving through doi.org | Assumption |
+| `identifiers` | `ee` URLs to ePrint/arXiv → `eprint`/`arxiv` cross-references | Our rule |
+| `status` | `@publtype="withdrawn"` → withdrawn | Assumption |
+
+Candidate rule (spec section 9): a paper is staged when its venue prefix is a
+`candidate` in `config/venues.yaml` **or** its title carries an explicit area-bearing
+rule hit; otherwise it is counted as filtered. Ordinals count every top-level record
+in document order; a resume re-streams and skips durable ordinals. A different dump
+file (SHA-256) is a new snapshot; an unfinished run on the old dump is marked
+`failed`/`superseded_snapshot`. DBLP supplies no total, so `expected_count` stays null.
+Entities resolve only through the local `dblp.dtd`; other external references
+resolve to nothing and the network is never used. `--huge-tree` lifts libxml2's
+size limits if the official dump requires it (to be determined on a real dump).
+
+## Crossref REST (`adapters/crossref.py`, parser `crossref-works-v1`)
+
+Endpoint `https://api.crossref.org/works/{doi}`, one request per planned DOI.
+`enrich-dois --max-records N` plans the DOIs of included/review works lacking a
+Crossref record, stores the list on the run, and resumes that list. `--mailto` is
+sent only when given explicitly.
+
+| Normalized field | Path | Status |
+|---|---|---|
+| `source_id`, `doi` | `message.DOI` (must equal the requested DOI) | Assumption |
+| `title` | `message.title[0]`, markup stripped | Assumption |
+| `authors` | ordered `message.author` (`given`, `family`, `name`, `ORCID`); editors excluded | Assumption |
+| `published` | earliest of `published-print`, `published-online`, `published`, `issued` | Spec rule |
+| `source_modified_at` | `message.deposited.date-time` (ordering only, never a publication date) | Our rule |
+| `venue_name` | `message.container-title[0]` | Assumption |
+| `identifiers` | `relation` has-preprint/is-preprint-of/version DOIs and arXiv IDs | Assumption |
+| `abstract` | not used (JATS abstract ignored in v1) | Our rule |
+| 404 | item quarantine `doi_not_found`; run continues | Our rule |
+| container types | `proceedings`, `journal`, `journal-issue`, ... → quarantine `container_doi` | Spec rule |
+
+Crossref records never create works. They attach to the single work that already
+holds the DOI when title/authors are compatible; otherwise an identity review
+(`crossref_metadata_conflicts_with_work`) is queued and nothing is overwritten.
+
+## Curated (`adapters/curated.py`, parser `curated-jsonl-v1`)
+
+`curation/foundations.jsonl`, format of spec section 9. Validated in full before
+staging (taxonomy IDs, safe evidence URLs, no `example.*` placeholders, unique slugs).
+Source ID `curated:<slug>`; links are `origin: curated`. After promotion, an
+`import_curated` curation command per entry sets inclusion, labels, and the
+foundational flag with the entry's `review_kind`.

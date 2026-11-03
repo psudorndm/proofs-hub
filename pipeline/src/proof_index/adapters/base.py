@@ -48,6 +48,7 @@ class HarvestRequest(BaseModel):
     window_from: datetime | None = None
     window_until: datetime | None = None
     max_pages: int | None = None  # verification bounds only; never a coverage cutoff
+    params: dict[str, Any] = Field(default_factory=dict)  # fixed per run (stored on the run)
 
 
 class Checkpoint(BaseModel):
@@ -79,6 +80,7 @@ class ParseContext(BaseModel):
     fetched_at: datetime
     plan_params: dict[str, Any] = Field(default_factory=dict)
     cursor: Cursor | None = None
+    http_status: int = 200
 
 
 class ParsedPage(BaseModel):

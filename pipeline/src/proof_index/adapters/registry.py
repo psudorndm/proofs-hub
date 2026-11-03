@@ -20,4 +20,8 @@ def adapter_for(name: str, config: SourcesConfig) -> SourceAdapter:
         from proof_index.adapters.arxiv_atom import ArxivAtomAdapter
 
         return ArxivAtomAdapter(config)
+    if name == "crossref":
+        from proof_index.adapters.crossref import CrossrefAdapter
+
+        return CrossrefAdapter(config)
     raise ConfigError(f"adapter {name!r} is not a paged HTTP adapter")

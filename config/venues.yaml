@@ -1,0 +1,60 @@
+# Venue registry (spec section 9). `key` is the DBLP key prefix (e.g. conf/crypto).
+#
+# cryptographic: true  -> venue evidence counts as cryptographic context when an
+#                         abstract is missing (classification may then return review).
+# candidate: true      -> DBLP records from this venue are kept as classification
+#                         candidates even without topic signals in their title.
+#
+# Compiled by the implementing agent (agent-provisional). DBLP prefixes have NOT been
+# checked against a live DBLP dump from this environment; verify with T16/T17.
+version: venues-v1
+venues:
+  # IACR and core cryptography venues
+  - {key: conf/crypto, name: CRYPTO, cryptographic: true, candidate: true}
+  - {key: conf/eurocrypt, name: EUROCRYPT, cryptographic: true, candidate: true}
+  - {key: conf/asiacrypt, name: ASIACRYPT, cryptographic: true, candidate: true}
+  - {key: conf/tcc, name: Theory of Cryptography Conference, cryptographic: true, candidate: true}
+  - {key: conf/pkc, name: Public Key Cryptography, cryptographic: true, candidate: true}
+  - {key: journals/joc, name: Journal of Cryptology, cryptographic: true, candidate: true}
+  - {key: conf/ches, name: CHES, cryptographic: true, candidate: true}
+  - {key: journals/tches, name: IACR Transactions on Cryptographic Hardware and Embedded Systems, cryptographic: true, candidate: true}
+  - {key: conf/fse, name: Fast Software Encryption, cryptographic: true, candidate: true}
+  - {key: journals/tosc, name: IACR Transactions on Symmetric Cryptology, cryptographic: true, candidate: true}
+  - {key: journals/iacr, name: IACR Cryptology ePrint Archive (DBLP copy), cryptographic: true, candidate: true}
+  - {key: journals/cic, name: IACR Communications in Cryptology, cryptographic: true, candidate: true}
+  - {key: conf/ctrsa, name: CT-RSA, cryptographic: true, candidate: true}
+  - {key: conf/acns, name: ACNS, cryptographic: true, candidate: true}
+  - {key: conf/fc, name: Financial Cryptography, cryptographic: true, candidate: true}
+  - {key: conf/pqcrypto, name: PQCrypto, cryptographic: true, candidate: true}
+  - {key: conf/sacrypt, name: Selected Areas in Cryptography, cryptographic: true, candidate: true}
+  - {key: conf/latincrypt, name: LATINCRYPT, cryptographic: true, candidate: true}
+  - {key: conf/africacrypt, name: AFRICACRYPT, cryptographic: true, candidate: true}
+  - {key: conf/indocrypt, name: INDOCRYPT, cryptographic: true, candidate: true}
+  - {key: conf/acisp, name: ACISP, cryptographic: true, candidate: true}
+  - {key: conf/scn, name: Security and Cryptography for Networks, cryptographic: true, candidate: true}
+  - {key: journals/dcc, name: Designs Codes and Cryptography, cryptographic: true, candidate: true}
+  # Security venues with substantial protocol analysis and verification work
+  - {key: conf/ccs, name: ACM CCS, cryptographic: true, candidate: true}
+  - {key: conf/sp, name: IEEE Symposium on Security and Privacy, cryptographic: true, candidate: true}
+  - {key: conf/uss, name: USENIX Security, cryptographic: true, candidate: true}
+  - {key: conf/ndss, name: NDSS, cryptographic: true, candidate: true}
+  - {key: conf/csfw, name: IEEE Computer Security Foundations, cryptographic: true, candidate: true}
+  - {key: conf/eurosp, name: IEEE EuroS&P, cryptographic: true, candidate: true}
+  - {key: conf/esorics, name: ESORICS, cryptographic: true, candidate: true}
+  - {key: journals/jcs, name: Journal of Computer Security, cryptographic: false, candidate: true}
+  - {key: journals/popets, name: Proceedings on Privacy Enhancing Technologies, cryptographic: false, candidate: true}
+  # Theory and formal-methods venues: candidates, classified on title evidence alone
+  - {key: conf/stoc, name: STOC, cryptographic: false, candidate: true}
+  - {key: conf/focs, name: FOCS, cryptographic: false, candidate: true}
+  - {key: conf/coco, name: Computational Complexity Conference, cryptographic: false, candidate: true}
+  - {key: conf/icalp, name: ICALP, cryptographic: false, candidate: true}
+  - {key: journals/eccc, name: ECCC, cryptographic: false, candidate: true}
+  - {key: journals/jacm, name: Journal of the ACM, cryptographic: false, candidate: true}
+  - {key: journals/siamcomp, name: SIAM Journal on Computing, cryptographic: false, candidate: true}
+  - {key: conf/cav, name: CAV, cryptographic: false, candidate: true}
+  - {key: conf/popl, name: POPL, cryptographic: false, candidate: true}
+  - {key: conf/pldi, name: PLDI, cryptographic: false, candidate: true}
+  - {key: conf/itp, name: Interactive Theorem Proving, cryptographic: false, candidate: true}
+  - {key: conf/cpp, name: Certified Programs and Proofs, cryptographic: false, candidate: true}
+  - {key: conf/post, name: Principles of Security and Trust, cryptographic: false, candidate: true}
+  - {key: conf/tacas, name: TACAS, cryptographic: false, candidate: true}

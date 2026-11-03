@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 from sqlalchemy import Engine, func, select
 
+from proof_index.adapters.registry import adapter_for
 from proof_index.classify.engine import Classifier
 from proof_index.classify.rules import load_rules
 from proof_index.classify.store import ClassificationHook
@@ -41,7 +42,9 @@ class Harness:
         rules = load_rules(
             ROOT / "config/relevance-rules.yaml", load_taxonomy(ROOT / "config/taxonomy.yaml")
         )
-        classify = ClassificationHook(Classifier(rules), self.clock, frozenset({"synthcrypto"}))
+        self.classifier = Classifier(rules)
+        self.taxonomy = load_taxonomy(ROOT / "config/taxonomy.yaml")
+        classify = ClassificationHook(self.classifier, self.clock, frozenset({"synthcrypto"}))
         self.builder = CanonicalBuilder(self.clock, rules.version, load_curation_state)
         self.events = EventRecorder(self.clock)
         self.resolver = IdentityResolver(
@@ -49,15 +52,22 @@ class Harness:
         )
         self.queue: list[list[dict[str, Any]]] = []
 
+        self.http_handler: Any = None  # set by tests that use real HTTP adapters
+
         def handle(request: httpx.Request) -> httpx.Response:
+            if self.http_handler is not None:
+                return self.http_handler(request)  # type: ignore[no-any-return]
             return httpx.Response(200, content=json.dumps(self.queue.pop(0)).encode())
+
+        def adapters(name: str, cfg: Any) -> Any:
+            return adapter_for(name, cfg) if name == "crossref" else JsonAdapter(cfg)
 
         self.runner, _ = make_runner(
             engine,
             tmp_path,
             handle,
             hooks=HookChain(classify, self.resolver),  # type: ignore[arg-type]
-            adapter_factory=lambda name, cfg: JsonAdapter(cfg),
+            adapter_factory=adapters,
             clock=self.clock,
         )
 

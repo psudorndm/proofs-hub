@@ -264,8 +264,11 @@ class IdentityResolver:
         record = c.current_record(conn, record_id)
         if record is None:
             return Assignment(None)
+        if record.source == "crossref":
+            return self._enrichment_attach(conn, record_id, record)
         decision = current_decision(conn, record_id, record.content_sha256(), self.rules_version)
-        if decision not in ("include", "review") and not self._has_override(conn, record_id):
+        always = record.source == "curated" or self._has_override(conn, record_id)
+        if decision not in ("include", "review") and not always:
             return Assignment(None)
         resolution = resolve_record(conn, record_id, record)
         _queue_reviews(conn, record_id, resolution.reviews, self.clock)
@@ -277,6 +280,31 @@ class IdentityResolver:
             .values(work_id=work_id)
         )
         return Assignment(work_id, newly_attached=True, new_work=is_new)
+
+    def _enrichment_attach(
+        self, conn: Connection, record_id: uuid.UUID, record: NormalizedRecord
+    ) -> Assignment:
+        """Crossref records enrich a known work by DOI; they never create works."""
+        rows = c.records_with_doi(conn, record.source_id, record_id)
+        by_work = _group_by_work(conn, rows)
+        for pub_work in c.works_with_publication_doi(conn, record.source_id):
+            by_work.setdefault(c.resolve_live(conn, pub_work), [])
+        if len(by_work) == 1:
+            work_id, members = next(iter(by_work.items()))
+            if members and _compatible(conn, record, members):
+                conn.execute(
+                    update(t.source_records)
+                    .where(t.source_records.c.id == record_id)
+                    .values(work_id=work_id)
+                )
+                return Assignment(work_id, newly_attached=True, new_work=False)
+            reason = "crossref_metadata_conflicts_with_work"
+        else:
+            reason = "doi_claimed_by_multiple_works" if by_work else "crossref_doi_without_work"
+        _queue_reviews(
+            conn, record_id, [(w, reason, {"doi": record.source_id}) for w in by_work], self.clock
+        )
+        return Assignment(None)
 
     def _has_override(self, conn: Connection, record_id: uuid.UUID) -> bool:
         return (

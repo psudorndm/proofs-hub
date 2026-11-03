@@ -1,0 +1,22 @@
+{"status": "ok", "message-type": "work", "message-version": "1.0.0",
+ "message": {
+  "_comment": "SYNTHETIC FIXTURE: hand-constructed in the documented Crossref REST shape; not a captured response.",
+  "DOI": "10.9999/SYNTHETIC.0001",
+  "type": "proceedings-article",
+  "title": ["Zero-Knowledge Proofs for <i>Private</i> Arithmetic Computations"],
+  "author": [
+    {"given": "Alice", "family": "Example", "sequence": "first", "ORCID": "http://orcid.org/0000-0002-1825-0097"},
+    {"given": "Bob", "family": "Example", "sequence": "additional"}
+  ],
+  "editor": [{"given": "Ed", "family": "Itor"}],
+  "container-title": ["Advances in Cryptology – CRYPTO 2020"],
+  "published-print": {"date-parts": [[2020, 8, 10]]},
+  "published-online": {"date-parts": [[2020, 8, 9]]},
+  "issued": {"date-parts": [[2020, 8, 9]]},
+  "created": {"date-parts": [[2020, 7, 1]], "date-time": "2020-07-01T00:00:00Z"},
+  "deposited": {"date-parts": [[2021, 1, 2]], "date-time": "2021-01-02T03:04:05Z"},
+  "indexed": {"date-parts": [[2026, 10, 1]], "date-time": "2026-10-01T00:00:00Z"},
+  "relation": {"has-preprint": [{"id-type": "doi", "id": "10.9999/preprint.1", "asserted-by": "subject"},
+                                 {"id-type": "arxiv", "id": "2001.00007", "asserted-by": "subject"}]},
+  "abstract": "<jats:p>Not used in v1.</jats:p>"
+ }}

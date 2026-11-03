@@ -35,7 +35,7 @@ from proof_index.resolve.candidates import resolve_live
 from proof_index.resolve.canonical import CanonicalBuilder, CurationState
 from proof_index.resolve.events import record_curation_event, sync_publication_event
 
-STATE_KINDS = ("include", "exclude", "set_labels", "set_fields")
+STATE_KINDS = ("include", "exclude", "set_labels", "set_fields", "import_curated")
 _COMMAND_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._\-]{2,127}$")
 _LABEL = re.compile(r"^new:[a-z0-9][a-z0-9\-]{0,40}$")
 
@@ -146,6 +146,18 @@ class RelateCommand(_Base):
     relation: Literal["extended_by", "related_to"]
 
 
+class ImportCuratedCommand(_Base):
+    """Internal: labels and foundational flag from a curated foundations entry."""
+
+    action: Literal["import_curated"]
+    work_id: uuid.UUID
+    curated_id: str
+    areas: list[Area]
+    topics: list[str]
+    contributions: list[Contribution]
+    foundational: bool
+
+
 class RevertCommand(_Base):
     action: Literal["revert"]
     reverts: str
@@ -160,6 +172,7 @@ Command = Annotated[
     | MergeCommand
     | SplitCommand
     | RelateCommand
+    | ImportCuratedCommand
     | RevertCommand,
     Field(discriminator="action"),
 ]
@@ -229,6 +242,11 @@ def fold_state(rows: list[dict[str, Any]]) -> CurationState:
             for name in ("areas", "topics", "contributions"):
                 if payload.get(name) is not None:
                     setattr(state, name, list(payload[name]))
+        elif kind == "import_curated":
+            state.visibility = "included"
+            state.areas = list(payload["areas"])
+            state.topics = list(payload["topics"])
+            state.contributions = list(payload["contributions"])
         elif kind == "set_fields":
             for name, value in payload["fields"].items():
                 if value is not None:
@@ -403,7 +421,7 @@ class CurationService:
                     f"merge needs expected_canonical_revision for {sorted(map(str, missing))}"
                 )
             return [(w, command.expected_canonical_revision[w]) for w in sorted(involved)]
-        if isinstance(command, (RelateCommand, RevertCommand)):
+        if isinstance(command, (RelateCommand, RevertCommand, ImportCuratedCommand)):
             return []
         return [(command.work_id, command.expected_canonical_revision)]
 
@@ -429,6 +447,12 @@ class CurationService:
                     "command_id": command.command_id,
                 }
             ]
+        if isinstance(command, ImportCuratedCommand):
+            conn.execute(
+                update(t.works)
+                .where(t.works.c.id == command.work_id)
+                .values(is_foundational=command.foundational)
+            )
         elif isinstance(command, MarkFoundationalCommand):
             conn.execute(
                 update(t.works)

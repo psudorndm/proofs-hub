@@ -6,8 +6,10 @@ under an existing key is a storage error, never a silent overwrite.
 
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Protocol
 
 from proof_index.errors import StorageError
@@ -30,6 +32,19 @@ class BlobStore(Protocol):
     def get(self, key: str) -> bytes: ...
 
     def exists(self, key: str, sha256: str | None = None) -> bool: ...
+
+    def put_file_if_absent(self, key: str, path: Path, sha256: str) -> BlobRef: ...
+
+
+def sha256_file(path: Path, chunk: int = 4 * 1024 * 1024) -> tuple[str, int]:
+    """Streamed SHA-256 and size of a (possibly very large) file."""
+    digest = hashlib.sha256()
+    size = 0
+    with path.open("rb") as handle:
+        while block := handle.read(chunk):
+            digest.update(block)
+            size += len(block)
+    return digest.hexdigest(), size
 
 
 def validate_key(key: str) -> str:

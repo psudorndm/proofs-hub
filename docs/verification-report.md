@@ -238,3 +238,25 @@ blocked by the separation constraint); split requires complete assignments;
 revert of include restores the automatic decision and double revert is refused;
 `test_revert_preserves_later_independent_source_observations`; relate and
 non-feed curation events.
+
+## T10 — Historical adapters and enrichment (2026-11-03)
+
+```text
+$ make test-db                 -> 263 passed (11 historical tests on PostgreSQL 17)
+$ uv run ruff check; uv run mypy (63 files) -> clean; migration head 0005
+$ uv run proof-index backfill --source dblp
+    error[invalid_input]: DBLP backfill needs --dump (download the current release ...)
+```
+
+Synthetic DBLP dump (`tests/fixtures/dblp/`, with a synthetic stand-in DTD):
+candidate filtering (venue or title signal), filtered/quarantined counts, unknown
+total preserved as null, editors excluded and numeric disambiguators removed,
+cross-ID merge with the ePrint work, `test_dblp_dump_restart_resumes_from_durable_ordinal`,
+changed dump starts a new snapshot and supersedes the unfinished one. Crossref
+(synthetic JSON through a mock transport): attach to the DOI's work, 404 and
+proceedings DOIs quarantined, earliest-manifestation date (not created/deposited/
+indexed), conflicting metadata → review without overwrite, paused run resumes only
+its stored DOI list. Curated: included + foundational + agent-provisional labels,
+idempotent re-import, corrected title keeps the stable slug and work ID, schema
+example and invalid lines rejected before staging, identifiers join an existing work.
+No real DBLP dump, Crossref response, or verified foundational entry was used.

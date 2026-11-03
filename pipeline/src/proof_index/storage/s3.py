@@ -6,11 +6,12 @@ conditional ``If-None-Match: *`` write so two writers cannot overwrite each othe
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from proof_index.errors import StorageError
 from proof_index.hashing import sha256_hex
-from proof_index.storage.base import BlobRef, validate_key, verify_body
+from proof_index.storage.base import BlobRef, sha256_file, validate_key, verify_body
 
 _META_KEY = "sha256"
 
@@ -71,6 +72,23 @@ class S3BlobStore:
                 return self.put_if_absent(key, body, sha256)
             raise StorageError(f"S3 put_object failed ({_error_code(exc)})") from exc
         return BlobRef(key, sha256, len(body), created=True)
+
+    def put_file_if_absent(self, key: str, path: Path, sha256: str) -> BlobRef:
+        actual, size = sha256_file(path)
+        if actual != sha256:
+            raise StorageError("file hash mismatch")
+        head = self._head(key)
+        if head is not None:
+            if head.get("Metadata", {}).get(_META_KEY) != sha256:
+                raise StorageError(f"blob {key!r} already exists with different content")
+            return BlobRef(key, sha256, int(head.get("ContentLength", size)), created=False)
+        try:
+            self.client.upload_file(
+                str(path), self.bucket, self._key(key), ExtraArgs={"Metadata": {_META_KEY: sha256}}
+            )
+        except Exception as exc:
+            raise StorageError(f"S3 upload failed ({_error_code(exc)})") from exc
+        return BlobRef(key, sha256, size, created=True)
 
     def get(self, key: str) -> bytes:
         try:

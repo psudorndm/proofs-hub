@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE dblp SYSTEM "dblp.dtd">
+<!-- SYNTHETIC FIXTURE: hand-constructed in DBLP's documented XML shape; not a captured dump. -->
+<dblp>
+<www mdate="2020-01-01" key="homepages/00/0001"><author>Some Person</author><title>Home Page</title></www>
+<inproceedings mdate="2021-03-04" key="conf/crypto/ExampleE20">
+<author>Alice Example</author>
+<author>Bob M&uuml;ller 0002</author>
+<editor>Ed Itor</editor>
+<title>Zero-Knowledge Proofs for <i>Private</i> Arithmetic Computations.</title>
+<pages>1-20</pages><year>2020</year><booktitle>CRYPTO</booktitle>
+<ee>https://doi.org/10.9999/SYNTHETIC.0001</ee>
+<ee type="oa">https://eprint.iacr.org/2020/007</ee>
+<crossref>conf/crypto/2020-1</crossref>
+</inproceedings>
+<proceedings mdate="2021-03-04" key="conf/crypto/2020-1"><editor>Ed Itor</editor><title>Advances in Cryptology - CRYPTO 2020.</title><year>2020</year></proceedings>
+<article mdate="2019-05-05" key="journals/misc/Bridge19">
+<author>Clara Civil</author><title>Load tests of steel bridges.</title><year>2019</year><journal>Misc. Eng.</journal>
+</article>
+<article mdate="2022-07-07" key="journals/misc/Tamarin22">
+<author>Dora Formal</author><title>Formal verification of the TLS handshake with Tamarin.</title><year>2022</year><journal>Misc. Eng.</journal>
+</article>
+<article mdate="2018-02-02" key="journals/joc/Cafe18" publtype="withdrawn">
+<author>Ren&eacute; Withdrawn</author><title>A withdrawn cryptology article.</title><year>2018</year><journal>J. Cryptol.</journal>
+</article>
+<inproceedings mdate="2020-01-01" key="conf/tcc/Broken20">
+<author>No Title</author><title></title><year>2020</year><booktitle>TCC</booktitle>
+</inproceedings>
+</dblp>

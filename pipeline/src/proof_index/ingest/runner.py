@@ -14,7 +14,7 @@ last durable cursor. Watermarks and success timestamps change only on
 from __future__ import annotations
 
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
@@ -27,6 +27,7 @@ from proof_index.adapters.base import (
     ExpiredCursor,
     HarvestRequest,
     ParseContext,
+    ParsedPage,
     SourceAdapter,
 )
 from proof_index.adapters.registry import adapter_for
@@ -49,7 +50,7 @@ from proof_index.http.rate_limit import Budget
 from proof_index.ingest.hooks import NoopHooks, PromotionHooks
 from proof_index.ingest.promote import promote_run
 from proof_index.ingest.staging import stage_page
-from proof_index.storage.base import BlobStore, raw_response_key
+from proof_index.storage.base import BlobRef, BlobStore, raw_response_key
 
 RESUMABLE_STATES = ("planned", "fetching", "paused", "staged", "promoting")
 MAX_CURSOR_REPLAYS = 3
@@ -131,13 +132,16 @@ class HarvestRunner:
         budget: Budget,
         *,
         faults: FaultInjection | None = None,
+        request_params: dict[str, Any] | None = None,
     ) -> RunSummary:
         stream = self.config.stream(stream_key)
         if not stream.enabled:
             raise ConfigError(f"stream {stream_key} is disabled")
         try:
             with advisory_lock(self.engine, provider_lock_name(stream.provider)):
-                return self._run_locked(stream, mode, budget, faults or FaultInjection())
+                return self._run_locked(
+                    stream, mode, budget, faults or FaultInjection(), request_params
+                )
         except LockHeldError as exc:
             return RunSummary(
                 stream_key,
@@ -152,11 +156,16 @@ class HarvestRunner:
     # -- internals -----------------------------------------------------------------
 
     def _run_locked(
-        self, stream: StreamConfig, mode: str, budget: Budget, faults: FaultInjection
+        self,
+        stream: StreamConfig,
+        mode: str,
+        budget: Budget,
+        faults: FaultInjection,
+        request_params: dict[str, Any] | None = None,
     ) -> RunSummary:
         adapter = self.adapter_factory(stream.adapter, self.config)
         stream_id = self._ensure_stream(stream)
-        run_id = self._resumable_or_new_run(stream, stream_id, mode)
+        run_id = self._resumable_or_new_run(stream, stream_id, mode, request_params)
         try:
             state = self._run_state(run_id)
             if state in ("planned", "fetching") or (
@@ -215,7 +224,12 @@ class HarvestRunner:
         return row.id  # type: ignore[no-any-return]
 
     def _resumable_or_new_run(
-        self, stream: StreamConfig, stream_id: uuid.UUID, mode: str
+        self,
+        stream: StreamConfig,
+        stream_id: uuid.UUID,
+        mode: str,
+        request_params: dict[str, Any] | None = None,
+        snapshot_key: str | None = None,
     ) -> uuid.UUID:
         now = self.clock.now()
         with transaction(self.engine) as conn:
@@ -229,7 +243,22 @@ class HarvestRunner:
                 .with_for_update()
             ).first()
             if existing is not None:
-                return existing.id  # type: ignore[no-any-return]
+                existing_row = conn.execute(
+                    select(t.harvest_runs).where(t.harvest_runs.c.id == existing.id)
+                ).one()
+                if snapshot_key is None or existing_row.snapshot_key == snapshot_key:
+                    return existing.id  # type: ignore[no-any-return]
+                # A changed snapshot is a new logical snapshot, never a continuation.
+                self._set_state(
+                    conn,
+                    existing.id,
+                    "failed",
+                    finished_at=now,
+                    error_code="superseded_snapshot",
+                    error_summary=(
+                        f"snapshot {existing_row.snapshot_key} superseded by {snapshot_key}"
+                    ),
+                )
             stream_row = conn.execute(
                 select(t.provider_streams).where(t.provider_streams.c.id == stream_id)
             ).one()
@@ -249,6 +278,8 @@ class HarvestRunner:
                     window_until=None,
                     started_at=now,
                     config_hash=stream.config_hash(),
+                    request_params=request_params,
+                    snapshot_key=snapshot_key,
                 )
             )
             conn.execute(
@@ -331,6 +362,7 @@ class HarvestRunner:
             mode=run.mode,
             window_from=run.window_from,
             window_until=run.window_until,
+            params=run.request_params or {},
         )
         plan = adapter.plan(request, Checkpoint())
         pages_this_call = 0
@@ -356,6 +388,7 @@ class HarvestRunner:
                     fetched_at=response.fetched_at,
                     plan_params=plan.params,
                     cursor=cursor,
+                    http_status=response.status,
                 )
                 try:
                     page = adapter.parse_page(response.body, context)
@@ -577,6 +610,108 @@ class HarvestRunner:
             .on_conflict_do_update(index_elements=["stream_id", "slice_key"], set_=values)
         )
 
+    # -- local snapshots (DBLP dump, curated file) -----------------------------------
+
+    def run_snapshot(
+        self,
+        stream_key: str,
+        mode: str,
+        budget: Budget,
+        *,
+        snapshot_key: str,
+        blob: BlobRef,
+        batches: Callable[[int], Iterator[ParsedPage]],
+        adapter_name: str,
+        parser_version: str,
+        faults: FaultInjection | None = None,
+    ) -> RunSummary:
+        """Stage a local snapshot in bounded batches, then promote it.
+
+        ``batches(after_ordinal)`` re-streams the snapshot and yields pages for items
+        after ``after_ordinal`` (``-1`` at the start). Each page's ``next_cursor`` is
+        ``{"after_ordinal": n}``; the final page has none. A different
+        ``snapshot_key`` starts a new logical snapshot instead of continuing.
+        """
+        stream = self.config.stream(stream_key)
+        faults = faults or FaultInjection()
+        try:
+            with advisory_lock(self.engine, provider_lock_name(stream.provider)):
+                stream_id = self._ensure_stream(stream)
+                run_id = self._resumable_or_new_run(
+                    stream, stream_id, mode, snapshot_key=snapshot_key
+                )
+                adapter = _SnapshotAdapter(adapter_name, parser_version)
+                try:
+                    state = self._run_state(run_id)
+                    if state in ("planned", "fetching") or (
+                        state == "paused" and self._paused_phase(run_id) == "fetching"
+                    ):
+                        if not self._stage_snapshot(run_id, blob, batches, budget, faults):
+                            return self._summary(stream, run_id)
+                    if self._run_state(run_id) in ("staged", "promoting", "paused"):
+                        if not self._promote(stream, adapter, run_id, budget, faults):  # type: ignore[arg-type]
+                            return self._summary(stream, run_id)
+                    self._finalize(stream, stream_id, run_id)
+                    return self._summary(stream, run_id)
+                except ProofIndexError as exc:
+                    self._fail(stream_id, run_id, exc)
+                    summary = self._summary(stream, run_id)
+                    summary.exit_code = exc.exit_code
+                    return summary
+        except LockHeldError as exc:
+            return RunSummary(
+                stream_key,
+                None,
+                "not_started",
+                False,
+                exc.exit_code,
+                error_code=exc.code,
+                message=str(exc),
+            )
+
+    def _stage_snapshot(
+        self,
+        run_id: uuid.UUID,
+        blob: BlobRef,
+        batches: Callable[[int], Iterator[ParsedPage]],
+        budget: Budget,
+        faults: FaultInjection,
+    ) -> bool:
+        with transaction(self.engine) as conn:
+            self._set_state(conn, run_id, "fetching")
+        epoch, last, _seen, next_ordinal = self._fetch_position(run_id)
+        if last is not None and last.is_terminal:
+            pass
+        else:
+            after = int(last.next_cursor["after_ordinal"]) if last is not None else -1
+            pages = 0
+            for page in batches(after):
+                with transaction(self.engine) as conn:
+                    stage_page(
+                        conn,
+                        run_id=run_id,
+                        ordinal=next_ordinal,
+                        epoch=epoch,
+                        request_fingerprint=blob.sha256,
+                        blob=blob,
+                        page=page,
+                        fetched_at=self.clock.now(),
+                    )
+                next_ordinal += 1
+                pages += 1
+                if faults.crash_after_pages is not None and pages >= faults.crash_after_pages:
+                    raise RuntimeError("injected crash after durable page (test)")
+                if page.terminal:
+                    break
+                if budget.nearly_exhausted(self.reserve_s):
+                    self._pause(run_id, "fetching", "budget")
+                    return False
+            else:
+                raise RunFailure("not_terminal", "snapshot stream ended without a terminal batch")
+        with transaction(self.engine) as conn:
+            self._set_state(conn, run_id, "staged", response_time=None)
+        return True
+
     # -- terminal states ------------------------------------------------------------------
 
     def _pause(self, run_id: uuid.UUID, phase: str, code: str, summary: str | None = None) -> None:
@@ -628,6 +763,14 @@ class HarvestRunner:
             message=run.error_summary,
             window_from=run.window_from.isoformat() if run.window_from else None,
         )
+
+
+class _SnapshotAdapter:
+    """Minimal adapter identity for promotion of locally staged snapshots."""
+
+    def __init__(self, name: str, parser_version: str) -> None:
+        self.name = name
+        self.parser_version = parser_version
 
 
 def _cursor_key(cursor: dict[str, Any]) -> str:

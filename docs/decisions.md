@@ -189,3 +189,21 @@ only adds load and delay.
   `merged_into` of every involved work must equal the original after-state;
   canonical revisions may differ (later independent observations are preserved).
   A split's new works become aliases of the original work on revert.
+
+## D013 — Historical inputs (T10)
+
+- DBLP and the curated file are *local snapshots*: `HarvestRunner.run_snapshot`
+  stages bounded batches as pages with `{"after_ordinal": n}` cursors and reuses the
+  same promotion, hooks, finalization, and coverage code as HTTP streams.
+- Large dumps are stored with `BlobStore.put_file_if_absent` (streamed copy/upload),
+  keyed by SHA-256, as the raw evidence for every DBLP page of that snapshot.
+- Crossref enrichment uses the generic paged runner with the DOI list fixed in
+  `harvest_runs.request_params` (migration 0005), so resumes never re-plan.
+  `RequestSpec.ok_statuses` lets the adapter turn a 404 into an item quarantine.
+- Identity special cases: Crossref records only enrich an existing work (no new
+  works); curated records always get a work regardless of rule classification.
+- Curated labels/foundational status are applied as idempotent internal
+  `import_curated` curation commands whose ID includes a hash of the labels, so a
+  label change produces a new audited command and an unchanged file is a no-op.
+- The venue registry (`config/venues.yaml`) is agent-compiled and its DBLP prefixes
+  are unverified until a real dump is processed.

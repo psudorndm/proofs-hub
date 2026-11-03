@@ -1,0 +1,4 @@
+{"status": "ok", "message-type": "work", "message": {
+  "_comment": "SYNTHETIC FIXTURE: a proceedings-volume DOI; must never be treated as a paper.",
+  "DOI": "10.9999/proceedings.2021", "type": "proceedings", "title": ["Proceedings of a Synthetic Conference"],
+  "issued": {"date-parts": [[2021]]}}}

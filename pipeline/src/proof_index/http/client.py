@@ -60,6 +60,8 @@ class RequestSpec:
     method: Literal["GET"] = "GET"
     accept: str | None = None
     max_bytes: int = DEFAULT_MAX_BYTES
+    # Non-2xx statuses the adapter parses itself (e.g. Crossref 404 = unknown DOI item).
+    ok_statuses: frozenset[int] = frozenset()
 
     def fingerprint(self) -> str:
         """Stable request identity (method, URL, sorted parameters)."""
@@ -231,7 +233,7 @@ class ProviderHttpClient:
                 len(body),
                 safe,
             )
-            if 200 <= status < 300:
+            if 200 <= status < 300 or status in spec.ok_statuses:
                 return FetchedResponse(
                     status=status,
                     body=body,
