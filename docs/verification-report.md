@@ -101,3 +101,21 @@ observation that belongs to another record; CHECK constraints (visibility,
 self-merge, terminal page with cursor, paused-without-phase); sorted/distinct
 separation pairs; immutable curation rows (UPDATE and DELETE rejected by trigger);
 no cascading delete; full rollback of a failing transaction.
+
+## T04 — Blob storage, HTTP, and locks (2026-11-03)
+
+```text
+$ make test-db                 -> 146 passed
+$ uv run ruff check; uv run mypy (29 files) -> clean
+```
+
+Local BlobStore: put/get/exists, idempotent identical put, hash-mismatch and
+overwrite rejection, path-traversal keys rejected. S3BlobStore: botocore `Stubber`
+verifies the conditional `IfNoneMatch="*"` put with SHA-256 metadata and the
+different-content error (no network). HTTP (httpx `MockTransport`, fake clock):
+503 retry with 2 s/4 s backoff, `Retry-After` seconds honored, `Retry-After`
+beyond the job budget raises `BudgetExhausted` without sleeping, 400/401/403/404
+not retried, 4-attempt cap, connect-error retries then `TransportFailure`, size
+limit, sanitized logs (no `mailto` value or URL password). PostgreSQL locks: a
+second holder gets exit code 5, release on exception, a terminated session
+releases its lock, and holding a lock leaves no `idle in transaction` session.

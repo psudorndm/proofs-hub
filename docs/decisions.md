@@ -87,3 +87,13 @@ requires elsewhere and change no listed meaning:
 Nullable JSONB columns use `none_as_null=True` so Python `None` is SQL NULL, not
 JSON `null`. A test (`test_migration_matches_table_metadata`) fails if the Alembic
 migration and the Core metadata drift apart.
+
+## D007 — Provider lock is a job-scoped session lock; spacing is in-process (T04)
+
+The provider advisory lock (`provider:<name>`) is held for a whole sync/backfill
+invocation on its own autocommit connection, so only one process talks to a
+provider at a time and no SQL transaction stays open during sleeps. Inside that
+process, `LimiterRegistry` spaces requests per provider (both arXiv adapters share
+`arxiv`). S3 creation uses a conditional `IfNoneMatch="*"` write and stores the
+SHA-256 as object metadata. The HTTP client redacts `mailto`, token, key,
+password, and signature query values in logs and in the stored sanitized URL.
