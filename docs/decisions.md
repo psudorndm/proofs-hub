@@ -272,3 +272,34 @@ only adds load and delay.
 - Old-style arXiv IDs (`hep-th/9901001`) are treated as identifier queries only with
   an explicit `arXiv:` prefix or arXiv URL, so ordinary `word/word` text is never
   misread as an identifier. Bare `YYYY/NNNN` is treated as an ePrint ID.
+
+## D017 — User-directed simplification of the reader site (2026-11-03)
+
+The user asked for a site similar to pqc-reference.org
+(MaherMamah7/Recent-post-quantum-papers), with a light violet background and no
+extra features for now, and chose in answer to explicit questions:
+
+- **Main page only**, matching the reference's structure: title, subtitle, short
+  intro, a search box, `area:` and `source:` toggle rows, then *this week*, *this
+  month*, *this year* (disjoint 0–6, 7–29, 30–364 day windows, day-precision dates,
+  active works) with one line per work: `[source] ID`, title, authors, area tags.
+- **Kept:** the search box (Pagefind). **Removed from the site:** paper detail pages,
+  archive/foundations/topic pages, RSS links, coverage/status pages, citation
+  buttons, abstracts in lists, advanced filters, and dark mode.
+- **No maintainer/affiliation line** until the user provides one.
+
+This intentionally defers several spec items (readable paper pages, archive pages,
+feeds, coverage/status pages — spec sections 13–15). The pipeline still exports all
+of that data (papers, feeds, citations, coverage, status), so they can be restored
+without data work. The "Preview dataset" label and an "updated <date>" footer line
+remain because the spec requires fixture data to be unmistakable.
+
+Implementation notes:
+- The reference repository has no license file, so its code and CSS were not copied;
+  the markup and violet palette here are original.
+- New export file `lists/recent.json` (`RecentLists` model, validated).
+- Without per-paper pages, the Pagefind index is built with `addCustomRecord` (one
+  record per work, card JSON in metadata, so results need no extra requests).
+  Custom records have no per-field weights; title ×3 and authors ×2 are approximated
+  by repeating them in the record text. Results show at most 100 entries with a note.
+- KaTeX math rendering in titles is kept (invisible unless a title contains math).

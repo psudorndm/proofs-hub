@@ -137,6 +137,16 @@ class ListPage(_Model):
     window_days: int | None = None
 
 
+class RecentLists(_Model):
+    """Disjoint recency windows for the main page (spec 12): 0-6, 7-29, 30-364 days."""
+
+    release_id: str
+    as_of_date: str
+    this_week: list[PaperCard]
+    this_month: list[PaperCard]
+    this_year: list[PaperCard]
+
+
 class SourceSummary(_Model):
     provider: str
     last_attempt_at: str | None

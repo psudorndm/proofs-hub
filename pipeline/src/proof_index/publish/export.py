@@ -29,7 +29,7 @@ from proof_index.db.repository import new_id, transaction
 from proof_index.errors import InputError
 from proof_index.hashing import sha256_hex
 from proof_index.models.classification import Taxonomy
-from proof_index.models.dates import PRECISION_RANK, PartialDate
+from proof_index.models.dates import PRECISION_RANK, PartialDate, bucket
 from proof_index.models.public import (
     PAGE_SIZE,
     ListPage,
@@ -44,6 +44,7 @@ from proof_index.models.public import (
     PublicPublication,
     PublicSource,
     PublicUpdate,
+    RecentLists,
     SourceSummary,
 )
 from proof_index.normalize.identifiers import eprint_display_id
@@ -497,6 +498,21 @@ def _write_release(
     )
     window = {"as_of_date": today.isoformat(), "window_days": WINDOW_DAYS}
     _write_list(root, "lists/new", "new", new, release_id, base, **window)
+    windows: dict[str, list[PaperCard]] = {"0-6": [], "7-29": [], "30-364": []}
+    for paper in active:  # already newest first
+        slot = bucket(paper.published, today)
+        if slot is not None:
+            windows[slot].append(card(paper, release_id, base))
+    _dump(
+        root / "lists" / "recent.json",
+        RecentLists(
+            release_id=release_id,
+            as_of_date=today.isoformat(),
+            this_week=windows["0-6"],
+            this_month=windows["7-29"],
+            this_year=windows["30-364"],
+        ).model_dump(mode="json"),
+    )
     _write_list(root, "lists/updated", "updated", updated, release_id, base, **window)
     years: dict[str, list[PublicPaper]] = {}
     for paper in active:

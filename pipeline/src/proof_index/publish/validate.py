@@ -12,7 +12,7 @@ from pydantic import ValidationError
 
 from proof_index.errors import DataValidationError
 from proof_index.hashing import sha256_hex
-from proof_index.models.public import ListPage, Manifest, PublicPaper
+from proof_index.models.public import ListPage, Manifest, PublicPaper, RecentLists
 
 FORBIDDEN_KEYS = frozenset(
     {
@@ -113,14 +113,30 @@ def validate_release(root: Path, *, require_live: bool = False) -> dict[str, Any
             f"manifest counts {manifest.included_work_count} works, found {len(paper_ids)}"
         )
 
+    recent_path = root / "lists" / "recent.json"
+    if not recent_path.is_file():
+        problems.append("lists/recent.json missing")
+    else:
+        try:
+            recent = RecentLists.model_validate_json(recent_path.read_text(encoding="utf-8"))
+        except ValidationError as exc:
+            problems.append(f"lists/recent.json invalid ({str(exc)[:200]})")
+        else:
+            ids = [c.id for c in [*recent.this_week, *recent.this_month, *recent.this_year]]
+            if len(ids) != len(set(ids)):
+                problems.append("lists/recent.json lists a work in more than one window")
+            problems += [f"lists/recent.json: unknown paper {i}" for i in ids if i not in paper_ids]
+
     # Lists: canonical works once, totals consistent, references resolvable.
     list_dirs = sorted(
-        {p.parent for p in root.glob("lists/**/*.json")}
+        {p.parent for p in root.glob("lists/**/*.json") if p.stem.isdigit()}
         | {p.parent for p in root.glob("topics/*/*.json")}
     )
     list_count = 0
     for directory in list_dirs:
-        pages = sorted(directory.glob("*.json"), key=lambda p: int(p.stem))
+        pages = sorted(
+            (p for p in directory.glob("*.json") if p.stem.isdigit()), key=lambda p: int(p.stem)
+        )
         seen: set[str] = set()
         totals = set()
         for path in pages:

@@ -6,10 +6,9 @@
 //   * A blank query must be passed as null.
 //   * {any: []} matches EVERYTHING, so a constrained but empty set returns zero
 //     locally and is never sent to Pagefind.
-import type { PaperCardData, PublicPaper } from "./contracts";
+import type { PaperCardData } from "./contracts";
 import { ageDays } from "./dates";
 
-export const PAGE_SIZE = 25 as const;
 export const MULTI_KEYS = ["area", "topic", "source", "venue", "kind", "status"] as const;
 export const VIEWS = ["new", "updated", "archive", "foundations"] as const;
 export const SORTS = ["newest", "oldest", "updated", "relevance"] as const;
@@ -268,25 +267,19 @@ export function translate(state: ParsedFilterState, facets: SearchFacets, today:
   };
 }
 
-// --- SearchService -------------------------------------------------------------------------------
+// --- SearchService ---------------------------------------------------------------------------
+
+export const MAX_SHOWN = 100 as const;
 
 export interface SearchRequest {
-  query: string;
-  filters: ParsedFilterState;
-  sort: Sort;
-  page: number;
-  pageSize: 25;
+  state: ParsedFilterState;
   todayUTC: string;
 }
 
 export interface SearchResult {
   releaseId: string;
   total: number;
-  page: number;
-  pageSize: 25;
   items: PaperCardData[];
-  pageCount: number;
-  approximateDates: boolean;
   identifier: string | null;
 }
 
@@ -314,77 +307,33 @@ export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) =>
   return out;
 }
 
-export function paperToCard(paper: PublicPaper, base: string): PaperCardData {
-  return {
-    id: paper.id,
-    title: paper.title,
-    authors: paper.authors.map((a) => a.display_name),
-    published: paper.published,
-    areas: paper.areas,
-    topics: paper.topics,
-    contributions: paper.contributions,
-    foundational: paper.foundational,
-    status: paper.status,
-    sources: paper.sources,
-    venue: paper.publications.find((p) => p.venue_name)?.venue_name ?? null,
-    doi: paper.publications.find((p) => p.doi)?.doi ?? null,
-    has_code: paper.code_links.length > 0,
-    has_abstract: paper.abstract !== null,
-    latest_update: paper.latest_update,
-    canonical_path: paper.canonical_path,
-    bibtex_path: paper.bibtex_path,
-    json_path: `${base}assets/releases/${paper.release_id}/papers/${paper.id}.json`,
-  };
-}
-
+/** Each Pagefind record carries its one-line card as metadata, so no extra fetches. */
 export class PagefindSearchService implements SearchService {
-  private cache = new Map<string, PublicPaper>();
-
   constructor(
     private readonly deps: {
       loadPagefind: () => Promise<PagefindApi>;
-      fetchPaper: (url: string) => Promise<unknown>;
-      validatePaper: (value: unknown) => PublicPaper;
       facets: SearchFacets;
       releaseId: string;
-      base: string;
       concurrency?: number;
     },
   ) {}
 
-  cached(id: string): PublicPaper | undefined {
-    return this.cache.get(`${this.deps.releaseId}:${id}`);
-  }
-
-  async paper(url: string, id: string): Promise<PublicPaper> {
-    const key = `${this.deps.releaseId}:${id}`;
-    const cached = this.cache.get(key);
-    if (cached) return cached;
-    const paper = this.deps.validatePaper(await this.deps.fetchPaper(url));
-    if (paper.release_id !== this.deps.releaseId) {
-      throw new ReleaseMismatchError("The index was updated while this page was open. Reload to continue.");
-    }
-    this.cache.set(key, paper);
-    return paper;
-  }
-
   async search(request: SearchRequest): Promise<SearchResult> {
-    const state = { ...request.filters, sort: request.sort, q: request.query };
-    const plan = translate(state, this.deps.facets, request.todayUTC);
-    const base = {
-      releaseId: this.deps.releaseId, page: request.page, pageSize: PAGE_SIZE,
-      approximateDates: plan.approximateDates, identifier: plan.identifier,
-    };
-    if (plan.empty) return { ...base, total: 0, items: [], pageCount: 1 };
+    const plan = translate(request.state, this.deps.facets, request.todayUTC);
+    const base = { releaseId: this.deps.releaseId, identifier: plan.identifier };
+    if (plan.empty) return { ...base, total: 0, items: [] };
     const pagefind = await this.deps.loadPagefind();
     const response = await pagefind.search(plan.query, { filters: plan.filters, sort: plan.sort });
-    const total = response.results.length;
-    const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
-    const slice = response.results.slice((request.page - 1) * PAGE_SIZE, request.page * PAGE_SIZE);
-    const concurrency = this.deps.concurrency ?? 6;
-    const fragments = await mapLimit(slice, concurrency, (r) => r.data());
-    const papers = await mapLimit(fragments, concurrency, (f) => this.paper(f.meta.json!, f.meta.id!));
-    return { ...base, total, pageCount, items: papers.map((p) => paperToCard(p, this.deps.base)) };
+    const shown = response.results.slice(0, MAX_SHOWN);
+    const fragments = await mapLimit(shown, this.deps.concurrency ?? 6, (r) => r.data());
+    const items = fragments.map((f) => {
+      const card = JSON.parse(f.meta.card ?? "null") as (PaperCardData & { release_id?: string }) | null;
+      if (!card || f.meta.release !== this.deps.releaseId) {
+        throw new ReleaseMismatchError("The index was updated while this page was open. Reload to continue.");
+      }
+      return card;
+    });
+    return { ...base, total: response.results.length, items };
   }
 }
 

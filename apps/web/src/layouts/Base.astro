@@ -1,46 +1,39 @@
 ---
+import "katex/dist/katex.min.css";
 import "../styles/global.css";
-import SiteHeader from "../components/SiteHeader.astro";
-import FreshnessBanner from "../components/FreshnessBanner.astro";
 import { manifest } from "../lib/catalog";
+import { PREVIEW_LABEL } from "../lib/format";
 import { withBase } from "../lib/urls";
 
-interface Props { title?: string; description?: string; canonicalPath?: string; noindex?: boolean }
-const { title, description, canonicalPath, noindex = false } = Astro.props;
+interface Props { title?: string; noindex?: boolean }
+const { title, noindex = false } = Astro.props;
 const m = manifest();
-const pageTitle = title ? `${title} · ${m.site_title}` : m.site_title;
-const canonical = canonicalPath ? new URL(canonicalPath, m.public_site_url).toString() : undefined;
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{pageTitle}</title>
-    <meta name="description" content={description ?? m.site_description} />
-    {canonical && <link rel="canonical" href={canonical} />}
+    <title>{title ? `${title} · ${m.site_title}` : m.site_title}</title>
+    <meta name="description" content={m.site_description} />
+    <link rel="canonical" href={new URL(withBase(""), m.public_site_url).toString()} />
     {(noindex || m.dataset_mode === "fixture") && <meta name="robots" content="noindex" />}
-    <link rel="alternate" type="application/atom+xml" title="New papers" href={withBase("feeds/new.atom")} />
-    <link rel="alternate" type="application/atom+xml" title="Updated papers" href={withBase("feeds/updated.atom")} />
     <meta name="proof-index-release" content={m.release_id} />
     <meta name="proof-index-base" content={withBase("")} />
-    <slot name="head" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
-    <SiteHeader />
-    <div class="container"><FreshnessBanner /></div>
-    <main id="main" class="container">
+    <main>
+      <header>
+        <h1 class="brand"><a href={withBase("")}>{m.site_title.toLowerCase()}</a></h1>
+        <p class="subtitle">proof systems · security proofs · formal verification</p>
+        <p class="intro">An index of papers on <strong>cryptographic proof systems</strong>, <strong>security proofs and protocol analysis</strong>, and <strong>formal verification</strong>, collected from the <a href="https://eprint.iacr.org/">IACR ePrint archive</a>, <a href="https://arxiv.org/">arXiv</a>, DBLP, and Crossref.</p>
+        {m.dataset_mode === "fixture" && <p class="preview" role="note">{PREVIEW_LABEL}</p>}
+      </header>
       <slot />
+      <footer>
+        <p>Metadata from the <a href="https://eprint.iacr.org/">IACR Cryptology ePrint Archive</a> (CC0), <a href="https://arxiv.org/">arXiv</a>, <a href="https://dblp.org/">DBLP</a>, and <a href="https://www.crossref.org/">Crossref</a>. Thanks to arXiv for use of its open access interoperability.</p>
+        <p>updated <time datetime={m.as_of_date}>{m.as_of_date}</time></p>
+      </footer>
     </main>
-    <footer class="site-footer">
-      <div class="container">
-        <p>
-          Release <span class="mono">{m.release_id}</span> · rules {m.rules_version} ·
-          snapshot {m.catalog_snapshot_at.slice(0, 10)} ·{" "}
-          <a href={withBase("about/")}>About and inclusion policy</a>
-        </p>
-      </div>
-    </footer>
   </body>
 </html>

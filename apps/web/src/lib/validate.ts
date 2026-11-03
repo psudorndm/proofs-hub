@@ -1,14 +1,12 @@
 // Runtime validation of untrusted release JSON with the exported schemas.
 import Ajv2020 from "ajv/dist/2020.js";
-import paperSchema from "./schema/public-paper.schema.json";
-import listSchema from "./schema/list-page.schema.json";
 import manifestSchema from "./schema/manifest.schema.json";
-import type { ListPage, Manifest, PublicPaper } from "./contracts";
+import recentSchema from "./schema/recent-lists.schema.json";
+import type { Manifest, RecentLists } from "./contracts";
 
 const ajv = new Ajv2020({ allErrors: false, strict: false });
-const paperValidator = ajv.compile(paperSchema);
-const listValidator = ajv.compile(listSchema);
 const manifestValidator = ajv.compile(manifestSchema);
+const recentValidator = ajv.compile(recentSchema);
 
 export class ContractError extends Error {}
 
@@ -20,6 +18,5 @@ function check<T>(validator: (v: unknown) => boolean, value: unknown, what: stri
   return value as T;
 }
 
-export const asPaper = (v: unknown): PublicPaper => check<PublicPaper>(paperValidator, v, "paper");
-export const asListPage = (v: unknown): ListPage => check<ListPage>(listValidator, v, "list page");
 export const asManifest = (v: unknown): Manifest => check<Manifest>(manifestValidator, v, "manifest");
+export const asRecent = (v: unknown): RecentLists => check<RecentLists>(recentValidator, v, "recent lists");

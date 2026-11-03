@@ -334,3 +334,22 @@ Unit tests cover `test_facet_OR_with_cross_facet_AND`,
 `test_partial_date_range_uses_documented_overlap_semantics`,
 `test_search_hydrates_only_requested_page` (25 of 60 hydrated, cache reused), and
 `test_late_search_response_cannot_replace_current_results`.
+
+## UI simplification per user direction (2026-11-03, D017)
+
+```text
+$ make test-db                                   -> 279 passed
+$ uv run python scripts/build_fixture_release.py --out work/releases/fixture-violet --bulk 40
+                                                 -> 51 papers, validated
+$ cd apps/web && npm run build                   -> 2 pages; build-search indexed 51 works
+$ npm run check                                  -> 0 errors;  npm test -> 44 passed
+$ node tests/browser/home-checks.mjs (Chromium, astro preview, clock 2026-11-03)
+                                                 -> 20/20 browser checks passed
+```
+
+Browser checks: three windows shown; empty window message; preview label; area and
+source toggles filter the lists, update the URL, combine with AND, and Back restores
+state; search replaces the lists, exact identifier and unknown identifier cases,
+result cap note, toggles filter search results; untrusted title text displayed
+safely; clearing search restores lists; static vs client-rendered entry parity;
+lists readable with JavaScript disabled; no overflow at 390 px; no JavaScript errors.

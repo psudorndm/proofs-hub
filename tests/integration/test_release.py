@@ -82,11 +82,11 @@ def release(engine: Engine, tmp_path: Path) -> tuple[Path, FixedClock]:
 def test_fixture_release_validates_with_consistent_counts(release: tuple[Path, FixedClock]) -> None:
     root, _ = release
     report = validate_release(root)
-    assert report["ok"] and report["papers"] == 9
+    assert report["ok"] and report["papers"] == 11
     manifest = load(root, "manifest.json")
     assert manifest["dataset_mode"] == "fixture"
-    assert manifest["included_work_count"] == 9
-    assert manifest["source_record_counts"] == {"arxiv": 2, "curated": 1, "eprint": 8}
+    assert manifest["included_work_count"] == 11
+    assert manifest["source_record_counts"] == {"arxiv": 2, "curated": 1, "eprint": 10}
     assert manifest["coverage_status"] == "partial"  # declared live streams have not run
     assert manifest["available_years"][-1] == "unknown"
 
@@ -124,6 +124,19 @@ def test_list_semantics(release: tuple[Path, FixedClock]) -> None:
     )
     empty = load(root, "topics/verified-implementations/1.json")
     assert empty["total"] == 0 and empty["items"] == [] and empty["page_count"] == 1
+
+
+def test_recent_windows_are_disjoint_day_precision_buckets(
+    release: tuple[Path, FixedClock],
+) -> None:
+    root, _ = release
+    recent = load(root, "lists/recent.json")
+    assert recent["as_of_date"] == "2026-11-03"
+    # F13 is dated 2026-10-30 (age 4). Year-only, unknown, withdrawn, and older works are absent.
+    assert [c["title"] for c in recent["this_week"]] == [
+        "Zero-knowledge proofs with tight security reductions for signature schemes"
+    ]
+    assert recent["this_month"] == [] and recent["this_year"] == []
 
 
 def test_ranks_are_unique_and_unknown_dates_sort_last(release: tuple[Path, FixedClock]) -> None:

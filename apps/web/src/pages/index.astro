@@ -1,6 +1,56 @@
 ---
-import ListView from "../components/ListView.astro";
-import { listPages } from "../lib/catalog";
-const [page] = listPages("lists/new");
+import Base from "../layouts/Base.astro";
+import PaperLine from "../components/PaperLine.astro";
+import { recent } from "../lib/catalog";
+import { EMPTY_WINDOW } from "../lib/format";
+const lists = recent();
+const sections = [
+  { id: "this-week", heading: "this week", cards: lists.this_week },
+  { id: "this-month", heading: "this month", cards: lists.this_month },
+  { id: "this-year", heading: "this year", cards: lists.this_year },
+];
+const areas = [
+  { id: "proof-systems", label: "proof systems" },
+  { id: "security-proofs", label: "security proofs" },
+  { id: "formal-verification", label: "formal verification" },
+  { id: "", label: "all" },
+];
+const sources = [{ id: "eprint", label: "ePrint" }, { id: "arxiv", label: "arXiv" }, { id: "", label: "all" }];
 ---
-<ListView page={page!} prefix="new" view="new" heading="New papers" context={`last ${page!.window_days} days, newest first`} />
+<Base>
+  <div class="controls" data-controls hidden>
+    <label class="visually-hidden" for="q">Search titles, authors, or IDs</label>
+    <input id="q" type="search" placeholder="search titles, authors, or IDs" autocomplete="off" />
+    <div class="filters">
+      <div class="filter-group" role="group" aria-label="Area">
+        <span class="filter-label">area:</span>
+        {areas.map((a) => <button type="button" class="filter" data-area={a.id} aria-pressed={a.id === "" ? "true" : "false"}>{a.label}</button>)}
+      </div>
+      <div class="filter-group" role="group" aria-label="Source">
+        <span class="filter-label">source:</span>
+        {sources.map((s) => <button type="button" class="filter" data-source={s.id} aria-pressed={s.id === "" ? "true" : "false"}>{s.label}</button>)}
+      </div>
+    </div>
+  </div>
+
+  <section data-results hidden aria-labelledby="results-h">
+    <h2 id="results-h">search results</h2>
+    <p class="count" aria-live="polite" data-count></p>
+    <ul class="paper-list" data-result-list></ul>
+  </section>
+
+  <div data-recent>
+    {sections.map((s) => (
+      <section aria-labelledby={s.id} data-window>
+        <h2 id={s.id}>{s.heading}</h2>
+        <ul class="paper-list">{s.cards.map((card) => <PaperLine card={card} />)}</ul>
+        <p class="empty" data-empty hidden={s.cards.length > 0}>{EMPTY_WINDOW}</p>
+      </section>
+    ))}
+  </div>
+
+  <script>
+    import { startHome } from "../lib/home";
+    startHome();
+  </script>
+</Base>

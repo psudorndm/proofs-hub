@@ -1,46 +1,62 @@
-// Client-side card renderer. Same DTO, classes, text, and structure as PaperCard.astro.
-// All provider text goes through textContent; no HTML from data is ever injected.
-import type { PaperCardData, Taxonomy } from "./contracts";
-import { ABSTRACT_UNAVAILABLE, cardModel } from "./format";
+// Client renderer for search results. Same DTO, classes, and structure as PaperLine.astro.
+// Provider text is escaped (textContent, or renderMathSafe's escaping + KaTeX output).
+import type { PaperCardData } from "./contracts";
+import { lineModel } from "./format";
+import { renderMathSafe } from "./math";
 
-function el<K extends keyof HTMLElementTagNameMap>(
-  doc: Document, tag: K, attrs: Record<string, string> = {}, text?: string,
-): HTMLElementTagNameMap[K] {
-  const node = doc.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-export function renderPaperCard(
-  doc: Document, card: PaperCardData, taxonomy: Taxonomy, abstract: string | null,
-): HTMLElement {
-  const m = cardModel(card, taxonomy);
-  const article = el(doc, "article", { class: "paper-card", "data-paper-id": m.id });
-  const h3 = el(doc, "h3", { class: "paper-title" });
-  h3.append(el(doc, "a", { href: m.href }, m.title));
-  article.append(h3);
-  const meta = el(doc, "p", { class: "paper-meta" });
-  meta.append(doc.createTextNode(`${m.authors} · `));
-  meta.append(el(doc, "span", m.approximateDate ? { class: "approx" } : {}, m.date));
-  if (m.venue) meta.append(doc.createTextNode(` · ${m.venue}`));
-  article.append(meta);
-  const tags = el(doc, "ul", { class: "paper-tags" });
-  for (const b of m.badges) tags.append(el(doc, "li", { class: b.className }, b.label));
-  tags.append(el(doc, "li", { class: "badge badge-contribution" }, m.contribution));
-  if (m.foundational) tags.append(el(doc, "li", { class: "badge badge-foundational" }, "Foundational"));
-  if (m.statusNote) tags.append(el(doc, "li", { class: "badge badge-status" }, m.statusNote));
-  article.append(tags);
-  const links = el(doc, "p", { class: "paper-links" });
-  for (const l of m.links) {
-    const attrs: Record<string, string> = { href: l.href, "data-kind": l.kind };
-    if (l.kind !== "cite" && l.kind !== "code") attrs.rel = "noopener";
-    links.append(el(doc, "a", attrs, l.label));
+export function renderPaperLine(doc: Document, card: PaperCardData): HTMLLIElement {
+  const m = lineModel(card);
+  const li = doc.createElement("li");
+  li.className = `paper ${m.areas[0]?.className.replace("tag ", "") ?? ""}`.trim();
+  li.dataset.paperId = m.id;
+  li.dataset.areas = m.areaIds.join(" ");
+  li.dataset.sources = m.providers.join(" ");
+  const meta = doc.createElement("span");
+  meta.className = "meta";
+  for (const s of m.sources) {
+    const ref = doc.createElement("span");
+    ref.className = "ref";
+    const tag = doc.createElement("span");
+    tag.className = "source";
+    tag.textContent = `[${s.tag}]`;
+    ref.append(tag);
+    if (s.id) {
+      ref.append(" ");
+      if (s.href) {
+        const a = doc.createElement("a");
+        a.href = s.href;
+        a.rel = "noopener";
+        a.textContent = s.id;
+        ref.append(a);
+      } else {
+        ref.append(s.id);
+      }
+    }
+    meta.append(ref);
   }
-  article.append(links);
-  const details = el(doc, "details", { class: "abstract" });
-  details.append(el(doc, "summary", {}, "Show abstract"));
-  details.append(el(doc, "p", { "data-math": "" }, abstract ?? ABSTRACT_UNAVAILABLE));
-  article.append(details);
-  return article;
+  li.append(meta);
+  const title = doc.createElement("span");
+  title.className = "paper-title";
+  title.innerHTML = renderMathSafe(m.title);
+  li.append(title);
+  const authors = doc.createElement("span");
+  authors.className = "authors";
+  authors.textContent = m.authors;
+  li.append(authors);
+  const tags = doc.createElement("span");
+  tags.className = "tags";
+  for (const a of m.areas) {
+    const t = doc.createElement("span");
+    t.className = a.className;
+    t.textContent = a.label;
+    tags.append(t);
+  }
+  if (m.note) {
+    const n = doc.createElement("span");
+    n.className = "tag tag-note";
+    n.textContent = m.note;
+    tags.append(n);
+  }
+  li.append(tags);
+  return li;
 }

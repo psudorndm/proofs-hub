@@ -1,38 +1,17 @@
-/* Design tokens (spec section 15). Contrast is checked in tests/contrast.test.ts. */
+/* Light violet palette. Contrast is checked in tests/contrast.test.ts. */
 :root {
-  --color-bg: #f7f8fb;
-  --color-surface: #ffffff;
-  --color-text: #172033;
-  --color-muted: #526174;
-  --color-border: #d9dfeb;
-  --color-accent: #2447a8;
-  --color-ps-bg: #e3ebfb;   --color-ps-text: #1d3f8f;
-  --color-sp-bg: #efe6fa;   --color-sp-text: #5b2a91;
-  --color-fv-bg: #dff3f1;   --color-fv-text: #0d5c55;
-  --color-topic-bg: #eef1f6; --color-topic-text: #33415a;
-  --color-warn-bg: #fff4d6; --color-warn-text: #6b4a00; --color-warn-border: #e8c766;
-  --color-preview-bg: #ffe7e0; --color-preview-text: #7a2410; --color-preview-border: #e9a08a;
-  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  --size-body: 1rem;      /* 16px */
-  --size-meta: 0.875rem;  /* 14px */
-  --line: 1.5;
-  --main-width: 1040px;
-  --pad: 24px;
-  --card-gap: 12px;
-  --card-pad: 16px;
-  --radius: 8px;
-}
-@media (max-width: 720px) { :root { --pad: 16px; } }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #10141c; --color-surface: #171c26; --color-text: #e6eaf2; --color-muted: #a3afc2;
-    --color-border: #2c3445; --color-accent: #8fb0ff;
-    --color-ps-bg: #1c2c4f; --color-ps-text: #c4d6ff;
-    --color-sp-bg: #31214a; --color-sp-text: #e1cdfb;
-    --color-fv-bg: #123c39; --color-fv-text: #b5ebe5;
-    --color-topic-bg: #232a38; --color-topic-text: #ccd4e2;
-    --color-warn-bg: #3a2f10; --color-warn-text: #f5dd9b; --color-warn-border: #6b5520;
-    --color-preview-bg: #43201a; --color-preview-text: #ffd0c3; --color-preview-border: #7a3a2c;
-  }
+  --color-bg: #f2edfb;
+  --color-surface: #fcfaff;
+  --color-text: #2b2140;
+  --color-muted: #5f5476;
+  --color-heading: #4a2f86;
+  --color-accent: #5a33b0;
+  --color-visited: #75359a;
+  --color-border: #e0d6f2;
+  --color-ps: #6d3fd1;  --color-ps-bg: #ebe3fb; --color-ps-text: #4a27a0;
+  --color-sp: #b23a7d;  --color-sp-bg: #f7e2ee; --color-sp-text: #8a235e;
+  --color-fv: #23798a;  --color-fv-bg: #dcf0f3; --color-fv-text: #145664;
+  --color-note-bg: #fbe7e2; --color-note-text: #8a2f1c;
+  --color-on-accent: #ffffff;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }

@@ -1,7 +1,7 @@
 # Implementation status
-Current task: T14
+Current task: T14 (rescoped by user, D017)
 Last completed task: T13
-Confirmed decisions: broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
+Confirmed decisions: reader site simplified to a single pqc-reference-style page with search, light violet, no detail/archive/feed/coverage pages for now (user, D017); broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
 
 Nothing in this repository is a completed production project yet. No backfill has
 run, no live provider data has been ingested, and no evaluation has been performed.
@@ -20,9 +20,9 @@ run, no live provider data has been ingested, and no evaluation has been perform
 | T09 | done | `resolve/{events,curation,review}.py`, `curate validate/apply`, `review export`, migration 0004; 19 PostgreSQL tests (verification report T09) | — |
 | T10 | done | `adapters/{dblp,crossref,curated}.py`, `config/venues.yaml`, `ingest/historical.py`, `run_snapshot`, `backfill --source dblp`, `import-curated`, `enrich-dois`, migration 0005; 11 PostgreSQL tests on synthetic inputs (verification report T10) | No real dump/API response processed (host blocked); `foundations.jsonl` intentionally empty until entries are verified (T17) |
 | T11 | done | `models/public.py`, `publish/{snapshot,export,feeds,bibtex,validate,fixture}.py`, `release export/validate`, `make fixture-export`, schema export; fixture release validates; 15 tests (verification report T11) | Real-data release blocked until live sources run |
-| T12 | done | `apps/web` (Astro 7 static output, components per spec 15, base-path-aware URLs, preview label, schema/base-path guards); 31 Vitest tests; crawl at `/` and `/proof-papers/` with 0 broken links/overflow/errors (verification report T12) | Math rendering and citation polish in T14; keyboard/a11y review in T19 |
+| T12 | done (UI later simplified, D017) | `apps/web` (Astro 7 static output, components per spec 15, base-path-aware URLs, preview label, schema/base-path guards); 31 Vitest tests; crawl at `/` and `/proof-papers/` with 0 broken links/overflow/errors (verification report T12) | Math rendering and citation polish in T14; keyboard/a11y review in T19 |
 | T13 | done | Pagefind index of canonical paper pages (weights, facets, ranks), `lib/search.ts` SearchService, URL state, controller, `renderPaperCard`; 47 Vitest tests; 22/22 real-index Chromium checks (verification report T13) | Full-corpus performance budget measured in T19 |
-| T14 | not_started | — | — |
+| T14 | partial | KaTeX math (trust off, escaped fallback), BibTeX/feeds still exported by the pipeline; single-page violet UI with 20/20 browser checks (D017) | Detail, archive, feed, coverage/status pages deferred by user direction |
 | T15 | not_started | — | — |
 | T16 | not_started | — | Needs provider network access |
 | T17 | not_started | — | Needs provider network access and durable compute |

@@ -1,9 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-  LatestOnly, PagefindSearchService, ReleaseMismatchError, emptyState, parseIdentifierQuery,
+  LatestOnly, MAX_SHOWN, PagefindSearchService, ReleaseMismatchError, emptyState, parseIdentifierQuery,
   parseState, serializeState, translate, withChange, type PagefindApi, type SearchFacets, type Vocabulary,
 } from "../src/lib/search";
-import type { PublicPaper } from "../src/lib/contracts";
 
 const vocab: Vocabulary = {
   area: ["formal-verification", "proof-systems", "security-proofs"],
@@ -122,64 +121,41 @@ describe("filter translation", () => {
   });
 });
 
-function fakePaper(id: string, release = "r1"): PublicPaper {
-  return {
-    schema_version: 1, release_id: release, id, title: `T ${id}`, authors: [], abstract: null,
-    published: { year: 2020, month: null, day: null, precision: "year" }, areas: ["proof-systems"],
-    topics: [], contributions: [], foundational: false, status: "active", metadata_issues: [],
-    sources: [], publications: [], code_links: [], latest_update: null,
-    inclusion: { review_status: "automatic", explanation: "", evidence: [] }, related_work_ids: [],
-    canonical_path: `/papers/${id}/`, bibtex_path: `/citations/${id}.bib`, history: [],
-  };
-}
-
-function fakePagefind(n: number, dataSpy: (id: string) => void): PagefindApi {
+function fakePagefind(n: number, dataSpy: (id: string) => void, release = "r1"): PagefindApi {
   return {
     search: vi.fn(async () => ({
       results: Array.from({ length: n }, (_, i) => ({
         id: `r${i}`,
-        data: async () => { dataSpy(`w${i}`); return { url: `/papers/w${i}/`, meta: { id: `w${i}`, json: `/j/w${i}.json` } }; },
+        data: async () => {
+          dataSpy(`w${i}`);
+          return { url: `/papers/w${i}/`, meta: { id: `w${i}`, release, card: JSON.stringify({ id: `w${i}` }) } };
+        },
       })),
     })),
   };
 }
 
 describe("SearchService", () => {
-  it("test_search_hydrates_only_requested_page", async () => {
+  it("hydrates only the results it shows (at most 100)", async () => {
     const hydrated: string[] = [];
-    const fetched: string[] = [];
-    const pf = fakePagefind(60, (id) => hydrated.push(id));
-    const service = new PagefindSearchService({
-      loadPagefind: async () => pf, facets, releaseId: "r1", base: "/",
-      validatePaper: (v) => v as PublicPaper,
-      fetchPaper: async (url) => { fetched.push(url); return fakePaper(url.slice(3, -5)); },
-    });
-    const result = await service.search({ query: "", filters: { ...emptyState(), page: 2 }, sort: "newest", page: 2, pageSize: 25, todayUTC: TODAY });
-    expect(result.total).toBe(60);
-    expect(result.pageCount).toBe(3);
-    expect(result.items.map((i) => i.id)).toEqual(Array.from({ length: 25 }, (_, i) => `w${i + 25}`));
-    expect(hydrated.length).toBe(25);
-    expect(fetched.length).toBe(25);
-    // Cached per release + work: a repeat search fetches nothing new.
-    await service.search({ query: "", filters: { ...emptyState(), page: 2 }, sort: "newest", page: 2, pageSize: 25, todayUTC: TODAY });
-    expect(fetched.length).toBe(25);
+    const service = new PagefindSearchService({ loadPagefind: async () => fakePagefind(260, (id) => hydrated.push(id)), facets, releaseId: "r1" });
+    const result = await service.search({ state: state("q=zero").state, todayUTC: TODAY });
+    expect(result.total).toBe(260);
+    expect(result.items.length).toBe(MAX_SHOWN);
+    expect(hydrated.length).toBe(MAX_SHOWN);
   });
 
   it("constrained empty sets never reach Pagefind", async () => {
     const pf = fakePagefind(5, () => {});
-    const service = new PagefindSearchService({ loadPagefind: async () => pf, facets, releaseId: "r1", base: "/",
-      validatePaper: (v) => v as PublicPaper, fetchPaper: async () => ({}) });
-    const r = await service.search({ query: "", filters: state("year_from=1700&year_to=1701").state, sort: "newest", page: 1, pageSize: 25, todayUTC: TODAY });
+    const service = new PagefindSearchService({ loadPagefind: async () => pf, facets, releaseId: "r1" });
+    const r = await service.search({ state: state("year_from=1700&year_to=1701").state, todayUTC: TODAY });
     expect(r.total).toBe(0);
     expect(pf.search).not.toHaveBeenCalled();
   });
 
   it("test_release_mismatch_requests_reload_not_silent_merge", async () => {
-    const service = new PagefindSearchService({ loadPagefind: async () => fakePagefind(1, () => {}), facets,
-      releaseId: "r1", base: "/", validatePaper: (v) => v as PublicPaper,
-      fetchPaper: async () => fakePaper("w0", "r2") });
-    await expect(service.search({ query: "", filters: emptyState(), sort: "newest", page: 1, pageSize: 25, todayUTC: TODAY }))
-      .rejects.toBeInstanceOf(ReleaseMismatchError);
+    const service = new PagefindSearchService({ loadPagefind: async () => fakePagefind(1, () => {}, "r2"), facets, releaseId: "r1" });
+    await expect(service.search({ state: state("q=zero").state, todayUTC: TODAY })).rejects.toBeInstanceOf(ReleaseMismatchError);
   });
 
   it("test_late_search_response_cannot_replace_current_results", async () => {

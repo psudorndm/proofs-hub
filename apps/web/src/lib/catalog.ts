@@ -1,8 +1,8 @@
 // Build-time loader for one validated release export (CATALOG_DIR). Node only.
 import fs from "node:fs";
 import path from "node:path";
-import type { ListPage, Manifest, PaperCardData, PublicPaper, Taxonomy } from "./contracts";
-import { asListPage, asManifest, asPaper } from "./validate";
+import type { Manifest, RecentLists, Taxonomy } from "./contracts";
+import { asManifest, asRecent } from "./validate";
 import supportedSchema from "./schema/public-paper.schema.json";
 
 function catalogDir(): string {
@@ -31,67 +31,8 @@ export function taxonomy(): Taxonomy {
   return readJson("taxonomy.json") as Taxonomy;
 }
 
-export function listPages(rel: string): ListPage[] {
-  const dir = path.join(catalogDir(), rel);
-  if (!fs.existsSync(dir)) return [];
-  const pages = fs.readdirSync(dir).filter((f: string) => /^\d+\.json$/.test(f))
-    .sort((a: string, b: string) => Number.parseInt(a, 10) - Number.parseInt(b, 10));
-  return pages.map((f: string) => {
-    const page = asListPage(readJson(`${rel}/${f}`));
-    if (page.release_id !== manifest().release_id) throw new Error(`${rel}/${f}: release mismatch`);
-    return page;
-  });
-}
-
-const paperCache = new Map<string, PublicPaper>();
-export function paper(id: string): PublicPaper {
-  let found = paperCache.get(id);
-  if (!found) {
-    found = asPaper(readJson(`papers/${id}.json`));
-    if (found.release_id !== manifest().release_id) throw new Error(`paper ${id}: release mismatch`);
-    paperCache.set(id, found);
-  }
-  return found;
-}
-
-export function paperIds(): string[] {
-  return fs.readdirSync(path.join(catalogDir(), "papers"))
-    .filter((f: string) => f.endsWith(".json")).map((f: string) => f.slice(0, -5)).sort();
-}
-
-export function abstractOf(card: PaperCardData): string | null {
-  return paper(card.id).abstract;
-}
-
-export function aliases(): Record<string, string> {
-  return (readJson("aliases.json") as { aliases: Record<string, string> }).aliases;
-}
-
-export function coverage(): any {
-  return readJson("coverage.json");
-}
-
-export function status(): any {
-  return readJson("status.json");
-}
-
-export interface SearchData {
-  rank_newest: number;
-  rank_oldest: number;
-  rank_updated: number;
-  publication_period: string;
-  update_period: string;
-  has_update: "yes" | "no";
-  identifiers: string[];
-  venues: string[];
-  code: "yes" | "no";
-  foundational: "yes" | "no";
-}
-
-let searchIndex: Record<string, SearchData> | undefined;
-export function searchData(id: string): SearchData {
-  searchIndex ??= (readJson("search-index-data.json") as { papers: Record<string, SearchData> }).papers;
-  const found = searchIndex[id];
-  if (!found) throw new Error(`no search data for paper ${id}`);
-  return found;
+export function recent(): RecentLists {
+  const lists = asRecent(readJson("lists/recent.json"));
+  if (lists.release_id !== manifest().release_id) throw new Error("lists/recent.json: release mismatch");
+  return lists;
 }

@@ -9,7 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
-from proof_index.models.public import ListPage, Manifest, PaperCard, PublicPaper
+from proof_index.models.public import ListPage, Manifest, PaperCard, PublicPaper, RecentLists
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -23,6 +23,7 @@ def main() -> None:
         ("public-paper", PublicPaper),
         ("paper-card", PaperCard),
         ("list-page", ListPage),
+        ("recent-lists", RecentLists),
         ("manifest", Manifest),
     ):
         schema = model.model_json_schema(by_alias=True)

@@ -1,101 +1,68 @@
-// Card content rules shared by PaperCard.astro and the client renderPaperCard().
+// One-line paper entry rules, shared by PaperLine.astro and the client renderer.
 import type { Area, PaperCardData, PublicSource, Taxonomy } from "./contracts";
-import { formatPublished } from "./dates";
 
 export const AREA_CLASS: Record<Area, string> = {
-  "proof-systems": "badge-ps",
-  "security-proofs": "badge-sp",
-  "formal-verification": "badge-fv",
+  "proof-systems": "area-ps",
+  "security-proofs": "area-sp",
+  "formal-verification": "area-fv",
 };
 
-const PROVIDER_NAMES: Record<string, string> = {
-  eprint: "ePrint",
-  arxiv: "arXiv",
-  dblp: "DBLP",
-  crossref: "Crossref",
-  curated: "Curated record",
+// Short tag labels (the list stays compact; full names are in the toggles).
+export const AREA_TAG: Record<Area, string> = {
+  "proof-systems": "proof systems",
+  "security-proofs": "security proofs",
+  "formal-verification": "formal verification",
 };
 
-export interface Badge { label: string; className: string }
-export interface LinkItem { label: string; href: string; kind: "source" | "pdf" | "publisher" | "code" | "cite" }
+const SOURCE_ORDER = ["eprint", "arxiv", "crossref", "dblp", "curated"];
+const SOURCE_TAG: Record<string, string> = {
+  eprint: "eprint", arxiv: "arxiv", crossref: "doi", dblp: "dblp", curated: "curated",
+};
 
-export interface CardModel {
+export interface SourceRef { tag: string; id: string; href: string | null }
+export interface LineModel {
   id: string;
   title: string;
-  href: string;
   authors: string;
-  date: string;
-  venue: string | null;
-  badges: Badge[];
-  contribution: string;
-  links: LinkItem[];
-  statusNote: string | null;
-  foundational: boolean;
-  approximateDate: boolean;
+  sources: SourceRef[];
+  areas: { label: string; className: string }[];
+  areaIds: string[];
+  providers: string[];
+  note: string | null;
 }
 
-function displayEprint(id: string): string {
-  const [year, num] = id.split("/");
-  return `${year}/${String(num ?? "").padStart(3, "0")}`;
-}
-
-export function sourceLabel(source: PublicSource): string {
-  const name = PROVIDER_NAMES[source.provider] ?? source.provider;
-  if (source.provider === "eprint") return `${name} ${displayEprint(source.source_id)}`;
-  if (source.provider === "arxiv") return `${name} ${source.source_id}${source.version ? source.version : ""}`;
-  return name;
-}
-
-export function authorsText(names: string[], max = 10): string {
-  if (names.length === 0) return "Authors unavailable";
-  if (names.length <= max) return names.join(", ");
-  return `${names.slice(0, max).join(", ")}, and ${names.length - max} more`;
-}
-
-export function labelFor(tax: Taxonomy, kind: "areas" | "topics" | "contributions", id: string): string {
-  const entry = (tax[kind] as { id: string; display_name: string }[]).find((e) => e.id === id);
-  return entry ? entry.display_name : id;
-}
-
-export function cardModel(card: PaperCardData, tax: Taxonomy): CardModel {
-  const badges: Badge[] = [
-    ...card.areas.map((a) => ({ label: labelFor(tax, "areas", a), className: `badge ${AREA_CLASS[a]}` })),
-    ...card.topics.map((t) => ({ label: labelFor(tax, "topics", t), className: "badge badge-topic" })),
-  ];
-  const links: LinkItem[] = [];
-  for (const source of card.sources) {
-    if (source.landing_url) links.push({ label: sourceLabel(source), href: source.landing_url, kind: "source" });
+export function displayId(source: PublicSource): string {
+  if (source.provider === "eprint") {
+    const [year, num] = source.source_id.split("/");
+    return `${year}/${String(num ?? "").padStart(3, "0")}`;
   }
-  if (card.doi) links.push({ label: "Publisher", href: `https://doi.org/${card.doi}`, kind: "publisher" });
-  const pdf = card.sources.find((s) => s.pdf_url);
-  if (pdf?.pdf_url) links.push({ label: "PDF", href: pdf.pdf_url, kind: "pdf" });
-  if (card.has_code) links.push({ label: "Code link", href: card.canonical_path, kind: "code" });
-  links.push({ label: "Cite", href: card.bibtex_path, kind: "cite" });
-  const contributions = card.contributions.map((c) => labelFor(tax, "contributions", c));
-  const withdrawnSources = card.sources.filter((s) => s.status !== "active").map(sourceLabel);
-  let statusNote: string | null = null;
-  if (card.status === "withdrawn") statusNote = "Withdrawn";
-  else if (card.status === "unavailable") statusNote = "Unavailable at all known sources";
-  else if (withdrawnSources.length) statusNote = `Withdrawn or deleted at: ${withdrawnSources.join(", ")}`;
+  if (source.provider === "curated") return "";
+  return source.source_id;
+}
+
+export function authorsText(names: string[]): string {
+  if (names.length === 0) return "Authors unavailable";
+  if (names.length === 1) return names[0]!;
+  return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+}
+
+export function lineModel(card: PaperCardData, _tax?: Taxonomy): LineModel {
+  const sources = [...card.sources]
+    .filter((s) => s.status === "active" || card.sources.every((x) => x.status !== "active"))
+    .sort((a, b) => SOURCE_ORDER.indexOf(a.provider) - SOURCE_ORDER.indexOf(b.provider))
+    .map((s) => ({ tag: SOURCE_TAG[s.provider] ?? s.provider, id: displayId(s), href: s.landing_url }));
   return {
     id: card.id,
-    title: card.title,
-    href: card.canonical_path,
+    title: card.title.replace(/\.\s*$/, ""),
     authors: authorsText(card.authors),
-    date: formatPublished(card.published),
-    venue: card.venue,
-    badges,
-    contribution: contributions.length ? contributions.join(" · ") : "Research paper",
-    links,
-    statusNote,
-    foundational: card.foundational,
-    approximateDate: card.published.precision !== "day",
+    sources,
+    areas: card.areas.map((a) => ({ label: AREA_TAG[a], className: `tag ${AREA_CLASS[a]}` })),
+    areaIds: card.areas,
+    providers: [...new Set(card.sources.map((s) => s.provider))],
+    note: card.status === "withdrawn" ? "withdrawn" : null,
   };
 }
 
-export const ABSTRACT_UNAVAILABLE = "Abstract unavailable from the indexed sources.";
+export const EMPTY_WINDOW = "No papers in this window.";
 export const PREVIEW_LABEL = "Preview dataset — not the live research index.";
-export const PARTIAL_FRESHNESS =
-  "Some sources have not refreshed successfully. Previously indexed papers remain available.";
-export const EMPTY_RESULTS = "No papers match these filters.";
-export const SEARCH_FAILED = "Search could not load. Retry or browse the archive.";
+export const SEARCH_FAILED = "Search could not load. The lists below still work.";

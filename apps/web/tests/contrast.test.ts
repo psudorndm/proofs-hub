@@ -20,26 +20,20 @@ const css = fs.readFileSync(path.join(import.meta.dirname, "../src/styles/tokens
 function tokens(block: string): Record<string, string> {
   return Object.fromEntries([...block.matchAll(/--(color-[\w-]+):\s*(#[0-9a-fA-F]{6})/g)].map((m) => [m[1]!, m[2]!]));
 }
-const light = tokens(css.split("@media (prefers-color-scheme: dark)")[0]!);
-const dark = { ...light, ...tokens(css.split("@media (prefers-color-scheme: dark)")[1]!) };
+const light = tokens(css);
 
 const PAIRS: [string, string][] = [
   ["color-text", "color-bg"], ["color-text", "color-surface"], ["color-muted", "color-bg"],
-  ["color-muted", "color-surface"], ["color-accent", "color-surface"], ["color-accent", "color-bg"],
+  ["color-muted", "color-surface"], ["color-accent", "color-bg"], ["color-accent", "color-surface"],
+  ["color-visited", "color-surface"], ["color-heading", "color-bg"],
   ["color-ps-text", "color-ps-bg"], ["color-sp-text", "color-sp-bg"], ["color-fv-text", "color-fv-bg"],
-  ["color-topic-text", "color-topic-bg"], ["color-warn-text", "color-warn-bg"],
-  ["color-preview-text", "color-preview-bg"],
+  ["color-note-text", "color-note-bg"], ["color-on-accent", "color-accent"],
 ];
 
 describe("token contrast (WCAG AA, 4.5:1)", () => {
-  for (const [name, scheme] of [["light", light], ["dark", dark]] as const) {
-    for (const [fg, bg] of PAIRS) {
-      it(`${name}: ${fg} on ${bg}`, () => {
-        expect(contrast(scheme[fg]!, scheme[bg]!)).toBeGreaterThanOrEqual(4.5);
-      });
-    }
+  for (const [fg, bg] of PAIRS) {
+    it(`${fg} on ${bg}`, () => {
+      expect(contrast(light[fg]!, light[bg]!)).toBeGreaterThanOrEqual(4.5);
+    });
   }
-  it("white button text on the light accent", () => {
-    expect(contrast("#ffffff", light["color-accent"]!)).toBeGreaterThanOrEqual(4.5);
-  });
 });

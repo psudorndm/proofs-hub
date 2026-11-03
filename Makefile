@@ -54,7 +54,7 @@ web-browser-check:
 	TEST_DATABASE_ADMIN_URL=$(TEST_DATABASE_ADMIN_URL) $(UV) run python scripts/build_fixture_release.py --out $(SEARCH_RELEASE) --bulk 40
 	cd apps/web && CATALOG_DIR=$(abspath $(SEARCH_RELEASE)) npm run build
 	cd apps/web && (npx astro preview --port 4321 --host 127.0.0.1 &) && sleep 5 && \
-	  node tests/browser/search-checks.mjs http://127.0.0.1:4321/; status=$$?; npx astro preview stop; exit $$status
+	  node tests/browser/home-checks.mjs http://127.0.0.1:4321/; status=$$?; npx astro preview stop; exit $$status
 
 lint:
 	$(UV) run ruff check pipeline tests scripts db

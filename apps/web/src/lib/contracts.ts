@@ -92,6 +92,14 @@ export interface ListPage {
   window_days: number | null;
 }
 
+export interface RecentLists {
+  release_id: string;
+  as_of_date: string;
+  this_week: PaperCardData[];
+  this_month: PaperCardData[];
+  this_year: PaperCardData[];
+}
+
 export interface SourceSummary {
   provider: string;
   last_attempt_at: string | null;

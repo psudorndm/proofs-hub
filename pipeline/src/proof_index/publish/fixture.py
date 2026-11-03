@@ -96,7 +96,24 @@ def build_fixture_catalog(
     f17 = dict(cases["F13"])
     f17["abstract"] = cases["F13"]["abstract"] + " (Synthetic correction.)"
     f17["source_modified_at"] = "2026-11-01T00:00:00Z"
-    batches = [[cases[c] for c in FIRST], [cases[c] for c in SECOND] + [f17]]
+    # F18: a work whose only source is withdrawn. F19: titles/abstracts with math.
+    f18 = dict(
+        cases["F14"],
+        source_id="2019/77",
+        status="withdrawn",
+        title="Zero-knowledge proofs withdrawn by their authors",
+        abstract="A synthetic withdrawn zero-knowledge proof record.",
+        published={"year": 2019, "month": 3, "day": 4, "precision": "day"},
+    )
+    f19 = dict(
+        cases["F12"],
+        source_id="2024/9",
+        title="Succinct arguments for $\\mathsf{NP}$ with $O(\\log n)$ verification",
+        abstract="We give a succinct argument with $O(\\log n)$ proof size; "
+        "malformed notation $\\frac{1}{$ stays as text.",
+        published={"year": 2024, "month": 2, "day": 2, "precision": "day"},
+    )
+    batches = [[cases[c] for c in FIRST] + [f18, f19], [cases[c] for c in SECOND] + [f17]]
     if bulk:
         batches.append([_bulk_record(i) for i in range(1, bulk + 1)])
     summaries = []
