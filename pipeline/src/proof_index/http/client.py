@@ -192,6 +192,18 @@ class ProviderHttpClient:
                 status, body, resp_headers = self._send(spec, url, headers)
             except ResponseTooLarge:
                 raise
+            except httpx.ProxyError as exc:
+                # A proxy refusal (e.g. CONNECT 403 from an egress policy) is a policy
+                # denial, not a transient fault: never retry it.
+                log.warning(
+                    "http provider=%s error=ProxyError attempt=%d url=%s (not retried)",
+                    spec.provider,
+                    attempt,
+                    safe,
+                )
+                raise TransportFailure(
+                    f"proxy refused the connection to {safe} ({exc}); not retried"
+                ) from None
             except (httpx.TimeoutException, httpx.TransportError) as exc:
                 elapsed = self._monotonic() - started
                 last_error = type(exc).__name__

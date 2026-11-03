@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: hand-constructed from the arXiv Atom API user manual; not a captured response. -->
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <title type="html">ArXiv Query: synthetic</title>
+  <id>http://arxiv.org/api/synthetic</id>
+  <updated>2026-11-03T00:00:00-05:00</updated>
+  <opensearch:totalResults>3</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <opensearch:itemsPerPage>2</opensearch:itemsPerPage>
+  <entry>
+    <id>http://arxiv.org/abs/2001.00007v2</id>
+    <updated>2020-03-01T10:00:00Z</updated>
+    <published>2020-01-05T18:00:00Z</published>
+    <title>Zero-knowledge proofs for private arithmetic computations</title>
+    <summary>We construct a zero-knowledge proof system for arithmetic circuits (revised).</summary>
+    <author><name>Alice Example</name></author>
+    <author><name>Bob Example Jr</name></author>
+    <arxiv:doi>10.9999/SYNTHETIC.0001</arxiv:doi>
+    <arxiv:comment>Full version of IACR ePrint 2020/007</arxiv:comment>
+    <link href="http://arxiv.org/abs/2001.00007v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2001.00007v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CR" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2001.00008v1</id>
+    <updated>2020-01-06T09:00:00Z</updated>
+    <published>2020-01-06T09:00:00Z</published>
+    <title></title>
+    <summary>Entry with an empty title must be quarantined.</summary>
+    <author><name>Nobody</name></author>
+  </entry>
+</feed>

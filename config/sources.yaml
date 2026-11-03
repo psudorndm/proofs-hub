@@ -1,0 +1,147 @@
+# Provider endpoints, rate limits, and harvest streams.
+#
+# `live_verified: false` means the mapping/endpoint is a documented assumption that
+# has not been checked against a live response from an environment that can reach
+# the provider. Recheck official guidance before enabling live collection.
+#
+# Changing a stream's `params`, `adapter`, or `kind` changes its config hash; the
+# runner refuses to reuse cursor state under a different hash. Bump the `:vN`
+# suffix of the key instead.
+version: sources-v1
+user_agent: "CryptographicProofsResearchIndex/0.1 (metadata indexer{contact})"
+
+providers:
+  eprint:
+    min_interval_seconds: 10.0      # conservative sequential delay; daily sync
+    endpoints:
+      oai: https://eprint.iacr.org/oai
+    guidance_urls: ["https://eprint.iacr.org/rss/"]
+    guidance_checked_on: null       # not reachable from the build environment
+    live_verified: false
+    notes: >-
+      ePrint OAI-PMH oai_dc mapping is unverified. The planning environment
+      received HTTP 403 for direct XML inspection.
+  arxiv:
+    min_interval_seconds: 3.1       # one request every 3.1 s, one connection
+    endpoints:
+      oai: https://oaipmh.arxiv.org/oai
+      atom: https://export.arxiv.org/api/query
+    guidance_urls:
+      - https://info.arxiv.org/help/api/tou.html
+      - https://info.arxiv.org/help/oa/index.html
+      - https://info.arxiv.org/help/api/user-manual.html
+    guidance_checked_on: null
+    live_verified: false
+  dblp:
+    min_interval_seconds: 5.0
+    endpoints:
+      dump_index: https://dblp.org/xml/release/
+      search: https://dblp.org/search/publ/api
+    max_response_bytes: 52428800
+    guidance_urls: ["https://dblp.org/faq/How+can+I+download+the+whole+dblp+dataset.html"]
+    live_verified: false
+  crossref:
+    min_interval_seconds: 1.0
+    endpoints:
+      works: https://api.crossref.org/works
+    guidance_urls: ["https://www.crossref.org/documentation/retrieve-metadata/rest-api/"]
+    live_verified: false
+  curated:
+    min_interval_seconds: 1.0
+    endpoints: {}
+    live_verified: true
+    notes: Version-controlled local file; no network.
+
+streams:
+  # --- IACR ePrint: the whole archive is in scope for classification -----------
+  - key: eprint:all:bootstrap:v1
+    provider: eprint
+    adapter: eprint
+    kind: bootstrap
+    params: {metadata_prefix: oai_dc, granularity: "YYYY-MM-DD"}
+  - key: eprint:all:incremental:v1
+    provider: eprint
+    adapter: eprint
+    kind: incremental
+    pairs_with: eprint:all:bootstrap:v1
+    overlap_days: 2
+    params: {metadata_prefix: oai_dc, granularity: "YYYY-MM-DD"}
+
+  # --- arXiv OAI-PMH: core categories ----------------------------------------------
+  # Assumption until `sources verify --source arxiv` resolves ListSets: the smallest
+  # verified enclosing set is `cs`, filtered locally on the record's category list
+  # (primary or cross-listed). If per-category sets exist, add new :v2 streams.
+  - key: arxiv:cs-core:bootstrap:v1
+    provider: arxiv
+    adapter: arxiv_oai
+    kind: bootstrap
+    params:
+      metadata_prefix: arXiv
+      set: cs
+      granularity: "YYYY-MM-DD"
+      category_filter: [cs.CR, cs.CC, cs.DS, cs.LO, cs.PL]
+  - key: arxiv:cs-core:incremental:v1
+    provider: arxiv
+    adapter: arxiv_oai
+    kind: incremental
+    pairs_with: arxiv:cs-core:bootstrap:v1
+    overlap_days: 2
+    params:
+      metadata_prefix: arXiv
+      set: cs
+      granularity: "YYYY-MM-DD"
+      category_filter: [cs.CR, cs.CC, cs.DS, cs.LO, cs.PL]
+
+  # --- arXiv Atom: supplemental title+abstract discovery in adjacent categories ------
+  - key: arxiv:adjacent-terms:supplemental:v1
+    provider: arxiv
+    adapter: arxiv_atom
+    kind: supplemental
+    params:
+      categories: [cs.IT, cs.AI, cs.LG, quant-ph]
+      fields: [ti, abs]
+      page_size: 200
+      max_results_per_query: 30000   # documented API ceiling; partition when exceeded
+      terms:
+        - zero knowledge
+        - zero-knowledge
+        - SNARK
+        - STARK
+        - succinct argument
+        - interactive proof
+        - probabilistically checkable proof
+        - interactive oracle proof
+        - polynomial commitment
+        - proof of knowledge
+        - verifiable computation
+        - security proof
+        - provable security
+        - universal composability
+        - random oracle model
+        - formal verification cryptographic
+        - protocol verification
+        - Tamarin prover
+        - ProVerif
+        - EasyCrypt
+        - CryptoVerif
+
+  # --- DBLP: one official dump snapshot, streamed (T10) ---------------------------------
+  - key: dblp:dump:snapshot:v1
+    provider: dblp
+    adapter: dblp
+    kind: snapshot
+    params: {venues_config: config/venues.yaml}
+
+  # --- Crossref: DOI enrichment of known works (T10) -------------------------------------
+  - key: crossref:doi:enrichment:v1
+    provider: crossref
+    adapter: crossref
+    kind: enrichment
+    params: {}
+
+  # --- Curated foundational collection (T10) ----------------------------------------------
+  - key: curated:foundations:snapshot:v1
+    provider: curated
+    adapter: curated
+    kind: snapshot
+    params: {path: curation/foundations.jsonl}

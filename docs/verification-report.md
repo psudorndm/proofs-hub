@@ -119,3 +119,29 @@ not retried, 4-attempt cap, connect-error retries then `TransportFailure`, size
 limit, sanitized logs (no `mailto` value or URL password). PostgreSQL locks: a
 second holder gets exit code 5, release on exception, a terminated session
 releases its lock, and holding a lock leaves no `idle in transaction` session.
+
+## T05 — Source contracts and parsers (2026-11-03)
+
+```text
+$ uv run pytest -q             -> 152 passed, 17 skipped (DB tests; run via make test-db)
+$ uv run ruff check; uv run mypy (40 files) -> clean
+$ uv run proof-index sources verify --source eprint --bounded
+    identify / list-metadata-formats / page-eprint_all_incremental_v1:
+    FAILED (TransportFailure: proxy refused the connection ... (403 Forbidden); not retried)
+    report: work/verification/verify-eprint-20261103T191741Z.json   exit 3
+$ uv run proof-index sources verify --source arxiv --bounded
+    all 5 steps refused by the sandbox proxy (403); exit 3
+```
+
+No live provider response was obtained; all parser evidence is from synthetic
+fixtures (`tests/fixtures/README.md`). Parser tests cover:
+`test_oai_no_records_match_is_successful_empty_window`, `badResumptionToken` →
+`ExpiredCursor`, `badArgument`/`cannotDisseminateFormat`/unknown codes fail,
+HTML login page, truncated XML, DOCTYPE entity, wrong root, bare XML declaration,
+namespace-URI reading with non-standard prefixes, empty-title quarantine with the
+rest of the page kept, deleted header → tombstone, `javascript:` link dropped,
+arXiv local category filter, `test_arxiv_atom_and_oai_share_source_identity`, old
+arXiv IDs (`cs/0101001`), explicit ePrint references, Atom error entries, Atom
+result-ceiling failure, startIndex mismatch. `test_verify.py` exercises the
+verification success path through a mock transport and found a real set-spec
+matching bug (`cs:cs:CR` uses colons), now fixed.

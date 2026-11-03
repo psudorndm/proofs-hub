@@ -297,3 +297,17 @@ def test_fingerprint_ignores_param_order() -> None:
     a = RequestSpec(provider="x", url="https://h.org", params=(("a", "1"), ("b", "2")))
     b = RequestSpec(provider="x", url="https://h.org", params=(("b", "2"), ("a", "1")))
     assert a.fingerprint() == b.fingerprint()
+
+
+def test_proxy_refusal_is_not_retried() -> None:
+    ft = FakeTime()
+    calls: list[int] = []
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        raise httpx.ProxyError("403 Forbidden", request=request)
+
+    with pytest.raises(TransportFailure, match="not retried"):
+        _client(httpx.MockTransport(handle), ft).fetch(SPEC)
+    assert len(calls) == 1
+    assert ft.slept == []

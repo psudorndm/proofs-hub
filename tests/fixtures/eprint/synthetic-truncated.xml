@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: hand-constructed from the OAI-PMH 2.0 specification; not a captured response. -->
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <responseDate>2026-11-03T06:17:05Z</responseDate>
+  <request verb="ListRecords" metadataPrefix="oai_dc">https://eprint.iacr.org/oai</request>
+  <ListRecords>
+    <record>
+      <header>
+        <identifier>oai:eprint.iacr.org:2020/0007</identifier>
+        <datestamp>2026-10-30</datestamp>
+      </header>
+      <metadata>
+        <d:dc xmlns:

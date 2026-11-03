@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<!-- SYNTHETIC FIXTURE: entity-expansion attempt; must be rejected. -->
+<!DOCTYPE OAI-PMH [<!ENTITY x "expanded">]>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"><responseDate>2026-11-03T00:00:00Z</responseDate>&x;</OAI-PMH>

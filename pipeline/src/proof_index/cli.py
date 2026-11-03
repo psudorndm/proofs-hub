@@ -12,6 +12,7 @@ import platform
 import shutil
 import subprocess
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import typer
@@ -129,6 +130,54 @@ def doctor(
         typer.echo("missing: " + ", ".join(summary["missing_settings"]))
     for name, result in summary["checks"].items():
         typer.echo(f"check {name}: ok ({result.get('server_version', '')})")
+
+
+sources_app = typer.Typer(
+    help="Source configuration and bounded verification.", no_args_is_help=True
+)
+app.add_typer(sources_app, name="sources")
+
+
+@sources_app.command("verify")
+@handle_errors
+def sources_verify(
+    source: str = typer.Option(..., "--source", help="eprint or arxiv"),
+    bounded: bool = typer.Option(
+        False, "--bounded", help="Required: confirms this is a small bounded check."
+    ),
+    out: Path = typer.Option(Path("work/verification"), "--out", help="Report directory."),
+    capture_fixtures: Path | None = typer.Option(
+        None, "--capture-fixtures", help="Also save raw responses with provenance here."
+    ),
+    as_json: bool = typer.Option(False, "--json"),
+) -> None:
+    """Run a bounded live check of one provider. Never writes to the catalog."""
+    from proof_index.clock import SystemClock
+    from proof_index.config.sources import load_sources
+    from proof_index.errors import InputError, ProviderError
+    from proof_index.verify import run_verification
+
+    if not bounded:
+        raise InputError("pass --bounded: verification is deliberately a small sample")
+    settings = load_settings()
+    config = load_sources(settings.source_config)
+    report = run_verification(
+        source,
+        config,
+        SystemClock(),
+        user_agent=config.render_user_agent(settings.project_contact),
+        out_dir=out,
+        capture_dir=capture_fixtures,
+    )
+    if as_json:
+        emit(report, True)
+    else:
+        for step in report["steps"]:
+            status = "ok" if step["ok"] else f"FAILED ({step['error']})"
+            typer.echo(f"{step['step']:<55} {status}")
+        typer.echo(f"report: {report['report_path']}")
+    if not report["all_steps_ok"]:
+        raise ProviderError(f"verification of {source} did not fully succeed; see report")
 
 
 @app.callback()

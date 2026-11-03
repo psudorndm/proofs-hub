@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: hand-constructed from the OAI-PMH 2.0 specification; not a captured response. -->
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <responseDate>2026-11-03T06:17:05Z</responseDate>
+  <request verb="ListRecords" metadataPrefix="oai_dc">https://eprint.iacr.org/oai</request>
+  <ListRecords>
+    <record>
+      <header>
+        <identifier>oai:eprint.iacr.org:2020/0007</identifier>
+        <datestamp>2026-10-30</datestamp>
+      </header>
+      <metadata>
+        <d:dc xmlns:d="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:e="http://purl.org/dc/elements/1.1/">
+          <e:title>Zero-knowledge   proofs for private arithmetic computations</e:title>
+          <e:creator>Alice Example</e:creator>
+          <e:creator>Bob Example</e:creator>
+          <e:subject>zero knowledge</e:subject>
+          <e:description>We construct a zero-knowledge proof system for arithmetic circuits with a cryptographic soundness analysis.</e:description>
+          <e:date>2020-01-03</e:date>
+          <e:date>2020-02-10</e:date>
+          <e:identifier>https://eprint.iacr.org/2020/007</e:identifier>
+          <e:identifier>javascript:alert(1)</e:identifier>
+          <e:relation>https://doi.org/10.9999/SYNTHETIC.0001</e:relation>
+          <e:rights>CC BY</e:rights>
+        </d:dc>
+      </metadata>
+    </record>
+    <record>
+      <header>
+        <identifier>oai:eprint.iacr.org:2020/0008</identifier>
+        <datestamp>2026-10-30</datestamp>
+      </header>
+      <metadata>
+        <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+          <dc:title>   </dc:title>
+          <dc:creator>Carol Example</dc:creator>
+          <dc:date>2020-01-04</dc:date>
+        </oai_dc:dc>
+      </metadata>
+    </record>
+    <record>
+      <header status="deleted">
+        <identifier>oai:eprint.iacr.org:2019/0100</identifier>
+        <datestamp>2026-10-31</datestamp>
+      </header>
+    </record>
+    <resumptionToken completeListSize="4" cursor="0">synthetic-token-1</resumptionToken>
+  </ListRecords>
+</OAI-PMH>

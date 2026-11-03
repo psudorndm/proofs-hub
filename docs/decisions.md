@@ -97,3 +97,17 @@ process, `LimiterRegistry` spaces requests per provider (both arXiv adapters sha
 `arxiv`). S3 creation uses a conditional `IfNoneMatch="*"` write and stores the
 SHA-256 as object metadata. The HTTP client redacts `mailto`, token, key,
 password, and signature query values in logs and in the stored sanitized URL.
+
+## D008 — Adapters store only provider-supplied links; identifier URLs are derived later (T05)
+
+Adapters record links that appear in provider metadata, with
+`origin="source_metadata"`. Landing URLs that follow from an identifier alone
+(`https://arxiv.org/abs/<id>`, `https://eprint.iacr.org/<id>`, `https://doi.org/<doi>`)
+are derived by the public projection (T11) and labeled as derived, rather than
+stored as if a provider had supplied them. No PDF URL is constructed from an ID.
+
+## D009 — Proxy refusals are not retried (T05)
+
+`httpx.ProxyError` (e.g. an egress policy answering CONNECT with 403) fails
+immediately as `TransportFailure`, like a provider 403. Retrying a policy denial
+only adds load and delay.

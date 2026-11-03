@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: hand-constructed OAI-PMH verb response; not captured. -->
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/">
+  <responseDate>2026-11-03T06:17:05Z</responseDate>
+  <request verb="ListSets">https://oaipmh.arxiv.org/oai</request>
+  <ListSets>
+    <set><setSpec>cs</setSpec><setName>Computer Science</setName></set>
+    <set><setSpec>cs:cs:CR</setSpec><setName>Cryptography and Security</setName></set>
+    <set><setSpec>math</setSpec><setName>Mathematics</setName></set>
+  </ListSets>
+</OAI-PMH>

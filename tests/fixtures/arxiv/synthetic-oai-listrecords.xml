@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: hand-constructed from arXiv's documented OAI "arXiv" format; not a captured response. -->
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/">
+  <responseDate>2026-11-03T06:20:00Z</responseDate>
+  <request verb="ListRecords" metadataPrefix="arXiv" set="cs">https://oaipmh.arxiv.org/oai</request>
+  <ListRecords>
+    <record>
+      <header>
+        <identifier>oai:arXiv.org:2001.00007</identifier>
+        <datestamp>2026-10-30</datestamp>
+        <setSpec>cs</setSpec>
+      </header>
+      <metadata>
+        <arXiv xmlns="http://arxiv.org/OAI/arXiv/">
+          <id>2001.00007</id>
+          <created>2020-01-05</created>
+          <authors>
+            <author><keyname>Example</keyname><forenames>Alice</forenames></author>
+            <author><keyname>Example</keyname><forenames>Bob</forenames><suffix>Jr</suffix></author>
+          </authors>
+          <title>Zero-knowledge proofs for private
+  arithmetic computations</title>
+          <categories>cs.CR cs.CC</categories>
+          <comments>Full version of IACR ePrint 2020/007</comments>
+          <doi>10.9999/SYNTHETIC.0001</doi>
+          <license>http://creativecommons.org/licenses/by/4.0/</license>
+          <abstract>  We construct a zero-knowledge proof system for arithmetic circuits.
+</abstract>
+        </arXiv>
+      </metadata>
+    </record>
+    <record>
+      <header>
+        <identifier>oai:arXiv.org:2001.00099</identifier>
+        <datestamp>2026-10-30</datestamp>
+        <setSpec>cs</setSpec>
+      </header>
+      <metadata>
+        <arXiv xmlns="http://arxiv.org/OAI/arXiv/">
+          <id>2001.00099</id>
+          <created>2020-01-09</created>
+          <authors><author><keyname>Other</keyname><forenames>Eve</forenames></author></authors>
+          <title>Neural network pruning heuristics</title>
+          <categories>cs.LG</categories>
+          <abstract>Not in the configured category filter.</abstract>
+        </arXiv>
+      </metadata>
+    </record>
+    <record>
+      <header>
+        <identifier>oai:arXiv.org:cs/0101001</identifier>
+        <datestamp>2026-10-30</datestamp>
+        <setSpec>cs</setSpec>
+      </header>
+      <metadata>
+        <arXiv xmlns="http://arxiv.org/OAI/arXiv/">
+          <id>cs/0101001</id>
+          <created>2001-01-02</created>
+          <updated>2001-03-15</updated>
+          <authors><author><keyname>Historic</keyname><forenames>Fay</forenames></author></authors>
+          <title>A logic of protocol authentication</title>
+          <categories>cs.LO cs.CR</categories>
+          <abstract>A formal logic for authentication protocols.</abstract>
+        </arXiv>
+      </metadata>
+    </record>
+    <record>
+      <header status="deleted">
+        <identifier>oai:arXiv.org:2002.00001</identifier>
+        <datestamp>2026-10-31</datestamp>
+      </header>
+    </record>
+    <resumptionToken completeListSize="4" cursor="0"></resumptionToken>
+  </ListRecords>
+</OAI-PMH>
