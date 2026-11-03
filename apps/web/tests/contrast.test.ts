@@ -26,7 +26,6 @@ const PAIRS: [string, string][] = [
   ["color-text", "color-bg"], ["color-text", "color-surface"], ["color-muted", "color-bg"],
   ["color-muted", "color-surface"], ["color-accent", "color-bg"], ["color-accent", "color-surface"],
   ["color-visited", "color-surface"], ["color-heading", "color-bg"],
-  ["color-ps-text", "color-ps-bg"], ["color-sp-text", "color-sp-bg"], ["color-fv-text", "color-fv-bg"],
   ["color-note-text", "color-note-bg"], ["color-on-accent", "color-accent"],
 ];
 

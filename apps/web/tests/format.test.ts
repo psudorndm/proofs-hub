@@ -26,13 +26,11 @@ describe("one-line entries", () => {
     expect(m.sources.map((s) => `[${s.tag}] ${s.id}`)).toEqual(["[eprint] 2021/042", "[arxiv] 2101.00001"]);
     expect(m.title).toBe("<script>x</script> Title");
     expect(m.authors).toBe("Ann, Bob and Cy");
-    expect(m.areas.map((a) => a.label)).toEqual(["proof systems", "security proofs"]);
     expect(m.providers).toEqual(["arxiv", "eprint", "dblp"]);
-    expect(m.note).toBeNull();
+    expect(Object.keys(m)).not.toContain("areas"); // no topic/area tags on entries
   });
 
-  it("labels withdrawn works and pads ePrint numbers", () => {
-    expect(lineModel({ ...card, status: "withdrawn" }).note).toBe("withdrawn");
+  it("pads ePrint numbers", () => {
     expect(displayId(card.sources[1]!)).toBe("2021/042");
     expect(authorsText([])).toBe("Authors unavailable");
     expect(authorsText(["Solo"])).toBe("Solo");

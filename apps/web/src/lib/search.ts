@@ -269,7 +269,7 @@ export function translate(state: ParsedFilterState, facets: SearchFacets, today:
 
 // --- SearchService ---------------------------------------------------------------------------
 
-export const MAX_SHOWN = 100 as const;
+export const BATCH_SIZE = 50 as const;
 
 export interface SearchRequest {
   state: ParsedFilterState;
@@ -281,10 +281,6 @@ export interface SearchResult {
   total: number;
   items: PaperCardData[];
   identifier: string | null;
-}
-
-export interface SearchService {
-  search(request: SearchRequest): Promise<SearchResult>;
 }
 
 export interface PagefindResult { id: string; data(): Promise<{ url: string; meta: Record<string, string> }> }
@@ -307,8 +303,12 @@ export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) =>
   return out;
 }
 
-/** Each Pagefind record carries its one-line card as metadata, so no extra fetches. */
-export class PagefindSearchService implements SearchService {
+/**
+ * Returns every matching work. Each Pagefind record carries its one-line card as
+ * metadata, so results are loaded in batches (``onBatch``) without extra requests.
+ * ``isCurrent`` lets a newer query stop an older one between batches.
+ */
+export class PagefindSearchService {
   constructor(
     private readonly deps: {
       loadPagefind: () => Promise<PagefindApi>;
@@ -318,28 +318,45 @@ export class PagefindSearchService implements SearchService {
     },
   ) {}
 
-  async search(request: SearchRequest): Promise<SearchResult> {
+  async search(
+    request: SearchRequest,
+    onBatch: (cards: PaperCardData[], total: number) => void = () => {},
+    isCurrent: () => boolean = () => true,
+  ): Promise<SearchResult> {
     const plan = translate(request.state, this.deps.facets, request.todayUTC);
     const base = { releaseId: this.deps.releaseId, identifier: plan.identifier };
     if (plan.empty) return { ...base, total: 0, items: [] };
     const pagefind = await this.deps.loadPagefind();
     const response = await pagefind.search(plan.query, { filters: plan.filters, sort: plan.sort });
-    const shown = response.results.slice(0, MAX_SHOWN);
-    const fragments = await mapLimit(shown, this.deps.concurrency ?? 6, (r) => r.data());
-    const items = fragments.map((f) => {
-      const card = JSON.parse(f.meta.card ?? "null") as (PaperCardData & { release_id?: string }) | null;
-      if (!card || f.meta.release !== this.deps.releaseId) {
-        throw new ReleaseMismatchError("The index was updated while this page was open. Reload to continue.");
-      }
-      return card;
-    });
-    return { ...base, total: response.results.length, items };
+    const total = response.results.length;
+    const items: PaperCardData[] = [];
+    for (let i = 0; i < total; i += BATCH_SIZE) {
+      if (!isCurrent()) break;
+      const fragments = await mapLimit(response.results.slice(i, i + BATCH_SIZE), this.deps.concurrency ?? 6, (r) => r.data());
+      const cards = fragments.map((f) => {
+        const card = JSON.parse(f.meta.card ?? "null") as PaperCardData | null;
+        if (!card || f.meta.release !== this.deps.releaseId) {
+          throw new ReleaseMismatchError("The index was updated while this page was open. Reload to continue.");
+        }
+        return card;
+      });
+      items.push(...cards);
+      if (isCurrent()) onBatch(cards, total);
+    }
+    return { ...base, total, items };
   }
 }
 
 /** Drop responses that finish after a newer query started. */
 export class LatestOnly {
   private seq = 0;
+
+  /** A token whose ``current()`` turns false once a newer task starts. */
+  begin(): { current: () => boolean } {
+    const mine = ++this.seq;
+    return { current: () => mine === this.seq };
+  }
+
   async run<T>(task: () => Promise<T>, apply: (value: T) => void): Promise<boolean> {
     const mine = ++this.seq;
     const value = await task();

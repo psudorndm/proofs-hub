@@ -1,4 +1,4 @@
-// Main page behaviour: area/source toggles over the static lists, and text search.
+// Main page behaviour: the source toggle over the static lists, and text search.
 import { todayUTC } from "./dates";
 import { SEARCH_FAILED } from "./format";
 import { renderPaperLine } from "./render";
@@ -38,25 +38,20 @@ export function startHome(doc: Document = document, win: Window = window): void 
 
   const read = (): ParsedFilterState => {
     const { state } = parseState(new URLSearchParams(win.location.search), VOCAB);
-    return { ...emptyState(), q: state.q, area: state.area.slice(0, 1), source: state.source.slice(0, 1) };
+    return { ...emptyState(), q: state.q, source: state.source.slice(0, 1) };
   };
   let state = read();
 
   function sync() {
     if (doc.activeElement !== input) input!.value = state.q;
-    for (const b of doc.querySelectorAll<HTMLButtonElement>("button[data-area]")) {
-      b.setAttribute("aria-pressed", String((state.area[0] ?? "") === b.dataset.area));
-    }
     for (const b of doc.querySelectorAll<HTMLButtonElement>("button[data-source]")) {
       b.setAttribute("aria-pressed", String((state.source[0] ?? "") === b.dataset.source));
     }
-    const area = state.area[0];
     const source = state.source[0];
     for (const section of recent!.querySelectorAll<HTMLElement>("[data-window]")) {
       let visible = 0;
       for (const li of section.querySelectorAll<HTMLLIElement>("li.paper")) {
-        const show = (!area || (li.dataset.areas ?? "").split(" ").includes(area))
-          && (!source || (li.dataset.sources ?? "").split(" ").includes(source));
+        const show = !source || (li.dataset.sources ?? "").split(" ").includes(source);
         li.hidden = !show;
         if (show) visible += 1;
       }
@@ -68,23 +63,26 @@ export function startHome(doc: Document = document, win: Window = window): void 
 
   async function search() {
     if (!state.q) return;
+    const token = latest.begin();
+    list!.replaceChildren();
     count!.textContent = "searching…";
-    await latest.run(
-      () => service.search({ state, todayUTC: todayUTC() }).catch((e: unknown) => e as Error),
-      (result) => {
-        list!.replaceChildren();
-        if (result instanceof ReleaseMismatchError) { count!.textContent = result.message; return; }
-        if (result instanceof Error) { count!.textContent = SEARCH_FAILED; return; }
-        for (const card of result.items) list!.append(renderPaperLine(doc, card));
-        if (result.total === 0) {
-          count!.textContent = result.identifier ? `no paper with identifier “${state.q}”` : "no papers match";
-        } else if (result.total > result.items.length) {
-          count!.textContent = `showing the first ${result.items.length} of ${result.total} papers; refine the search to narrow it`;
-        } else {
-          count!.textContent = `${result.total} ${result.total === 1 ? "paper" : "papers"}`;
-        }
-      },
-    );
+    try {
+      const result = await service.search({ state, todayUTC: todayUTC() }, (cards, total) => {
+        for (const card of cards) list!.append(renderPaperLine(doc, card));
+        const shown = list!.children.length;
+        count!.textContent = shown < total
+          ? `${total} papers (loading ${shown}…)`
+          : `${total} ${total === 1 ? "paper" : "papers"}`;
+      }, token.current);
+      if (!token.current()) return;
+      if (result.total === 0) {
+        count!.textContent = result.identifier ? `no paper with identifier “${state.q}”` : "no papers match";
+      }
+    } catch (error) {
+      if (!token.current()) return;
+      list!.replaceChildren();
+      count!.textContent = error instanceof ReleaseMismatchError ? error.message : SEARCH_FAILED;
+    }
   }
 
   function update(change: Partial<ParsedFilterState>, push: boolean) {
@@ -97,9 +95,6 @@ export function startHome(doc: Document = document, win: Window = window): void 
     void search();
   }
 
-  for (const b of doc.querySelectorAll<HTMLButtonElement>("button[data-area]")) {
-    b.addEventListener("click", () => update({ area: b.dataset.area ? [b.dataset.area] : [] }, true));
-  }
   for (const b of doc.querySelectorAll<HTMLButtonElement>("button[data-source]")) {
     b.addEventListener("click", () => update({ source: b.dataset.source ? [b.dataset.source] : [] }, true));
   }

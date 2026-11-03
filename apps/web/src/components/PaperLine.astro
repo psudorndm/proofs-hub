@@ -5,12 +5,10 @@ import { renderMathSafe } from "../lib/math";
 interface Props { card: PaperCardData }
 const m = lineModel(Astro.props.card);
 ---
-<li class:list={["paper", m.areas[0]?.className.replace("tag ", "")]} data-paper-id={m.id}
-  data-areas={m.areaIds.join(" ")} data-sources={m.providers.join(" ")}>
+<li class="paper" data-paper-id={m.id} data-sources={m.providers.join(" ")}>
   <span class="meta">{m.sources.map((s) => (
     <span class="ref"><span class="source">[{s.tag}]</span>{s.id && <> {s.href ? <a href={s.href} rel="noopener">{s.id}</a> : s.id}</>}</span>
   ))}</span>
   <span class="paper-title" set:html={renderMathSafe(m.title)} />
   <span class="authors">{m.authors}</span>
-  <span class="tags">{m.areas.map((a) => <span class={a.className}>{a.label}</span>)}{m.note && <span class="tag tag-note">{m.note}</span>}</span>
 </li>

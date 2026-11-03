@@ -353,3 +353,15 @@ state; search replaces the lists, exact identifier and unknown identifier cases,
 result cap note, toggles filter search results; untrusted title text displayed
 safely; clearing search restores lists; static vs client-rendered entry parity;
 lists readable with JavaScript disabled; no overflow at 390 px; no JavaScript errors.
+
+## Search-only UI (2026-11-03, D018)
+
+```text
+$ cd apps/web && npm test        -> 42 passed;  npm run check -> 0 errors
+$ npm run build                  -> build-search indexed 51 works
+$ node tests/browser/home-checks.mjs -> 19/19 browser checks passed
+```
+
+Adds: no area toggles or tags present; source toggle filters lists and search
+results; Back restores the toggle; search returns every match (rendered count equals
+reported total for a query matching more than 25 works).

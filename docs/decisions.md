@@ -303,3 +303,13 @@ Implementation notes:
   Custom records have no per-field weights; title ×3 and authors ×2 are approximated
   by repeating them in the record text. Results show at most 100 entries with a note.
 - KaTeX math rendering in titles is kept (invisible unless a title contains math).
+
+## D018 — Search bar and source toggle only (2026-11-03, user direction)
+
+Per the user: no area/topic tags on entries and no area toggles; keep the search
+bar and a source row like the reference (`source: ePrint / arXiv / all`). Search
+now returns every matching work (no 100-result cap): results load in batches of 50
+and are appended as they arrive; a newer query stops an older one between batches.
+Search covers active works; withdrawn works are not shown because entries no longer
+carry a status label. `?area=` in old URLs is ignored. `all` is used instead of the
+reference's `both` because works may also come only from DBLP, Crossref, or curation.

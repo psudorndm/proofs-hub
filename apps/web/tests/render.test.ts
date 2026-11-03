@@ -14,9 +14,9 @@ describe("renderPaperLine", () => {
 
   it("uses the shared structure, classes, and filter data", () => {
     const li = renderPaperLine(document, card);
-    expect(li.className).toBe("paper area-ps");
-    expect([...li.children].map((c) => c.className)).toEqual(["meta", "paper-title", "authors", "tags"]);
-    expect(li.dataset.areas).toBe("proof-systems security-proofs");
+    expect(li.className).toBe("paper");
+    expect([...li.children].map((c) => c.className)).toEqual(["meta", "paper-title", "authors"]);
+    expect(li.querySelector(".tag")).toBeNull();
     expect(li.dataset.sources).toBe("arxiv eprint dblp");
     expect(li.querySelector(".meta")!.textContent).toBe("[eprint] 2021/042[arxiv] 2101.00001");
   });

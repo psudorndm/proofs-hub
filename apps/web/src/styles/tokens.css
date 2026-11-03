@@ -8,9 +8,7 @@
   --color-accent: #5a33b0;
   --color-visited: #75359a;
   --color-border: #e0d6f2;
-  --color-ps: #6d3fd1;  --color-ps-bg: #ebe3fb; --color-ps-text: #4a27a0;
-  --color-sp: #b23a7d;  --color-sp-bg: #f7e2ee; --color-sp-text: #8a235e;
-  --color-fv: #23798a;  --color-fv-bg: #dcf0f3; --color-fv-text: #145664;
+  --color-ps: #6d3fd1;
   --color-note-bg: #fbe7e2; --color-note-text: #8a2f1c;
   --color-on-accent: #ffffff;
   --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;

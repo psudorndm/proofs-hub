@@ -1,18 +1,5 @@
 // One-line paper entry rules, shared by PaperLine.astro and the client renderer.
-import type { Area, PaperCardData, PublicSource, Taxonomy } from "./contracts";
-
-export const AREA_CLASS: Record<Area, string> = {
-  "proof-systems": "area-ps",
-  "security-proofs": "area-sp",
-  "formal-verification": "area-fv",
-};
-
-// Short tag labels (the list stays compact; full names are in the toggles).
-export const AREA_TAG: Record<Area, string> = {
-  "proof-systems": "proof systems",
-  "security-proofs": "security proofs",
-  "formal-verification": "formal verification",
-};
+import type { PaperCardData, PublicSource, Taxonomy } from "./contracts";
 
 const SOURCE_ORDER = ["eprint", "arxiv", "crossref", "dblp", "curated"];
 const SOURCE_TAG: Record<string, string> = {
@@ -25,10 +12,7 @@ export interface LineModel {
   title: string;
   authors: string;
   sources: SourceRef[];
-  areas: { label: string; className: string }[];
-  areaIds: string[];
   providers: string[];
-  note: string | null;
 }
 
 export function displayId(source: PublicSource): string {
@@ -56,10 +40,7 @@ export function lineModel(card: PaperCardData, _tax?: Taxonomy): LineModel {
     title: card.title.replace(/\.\s*$/, ""),
     authors: authorsText(card.authors),
     sources,
-    areas: card.areas.map((a) => ({ label: AREA_TAG[a], className: `tag ${AREA_CLASS[a]}` })),
-    areaIds: card.areas,
     providers: [...new Set(card.sources.map((s) => s.provider))],
-    note: card.status === "withdrawn" ? "withdrawn" : null,
   };
 }
 

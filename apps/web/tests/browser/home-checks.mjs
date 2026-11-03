@@ -38,17 +38,16 @@ check("this week lists the recent work", (await sectionTitles("this-week")).incl
 check("empty window says so", await page.$eval('section[aria-labelledby="this-month"] [data-empty]', (n) => !n.hidden));
 check("preview label is shown", (await page.textContent(".preview")).includes("Preview dataset — not the live research index."));
 
-await page.click('button[data-area="formal-verification"]');
-check("area toggle filters the lists", (await sectionTitles("this-week")).length === 0 && await page.$eval('section[aria-labelledby="this-week"] [data-empty]', (n) => !n.hidden));
-check("area toggle updates the URL", page.url().includes("area=formal-verification"));
-await page.click('button[data-area="security-proofs"]');
-check("a work with two areas matches either", (await sectionTitles("this-week")).includes(F13));
+check("no area toggles or tags", (await page.$$("button[data-area], .tag")).length === 0);
 await page.click('button[data-source="arxiv"]');
-check("area and source combine (AND)", (await sectionTitles("this-week")).includes(F13), "F13 has an arXiv source");
+check("source toggle filters the lists", (await sectionTitles("this-week")).includes(F13) &&
+  (await sectionTitles("this-year")).length === 0 && page.url().includes("source=arxiv"), "F13 has an arXiv source; the bulk records are ePrint-only");
+await page.click('button[data-source="eprint"]');
+check("ePrint toggle shows ePrint papers", (await sectionTitles("this-year")).length > 0);
 await page.goBack();
-check("back restores the previous toggle", page.url().includes("area=security-proofs") && !page.url().includes("source=") &&
-  await page.$eval('button[data-source=""]', (b) => b.getAttribute("aria-pressed") === "true"));
-await page.click('button[data-area=""]');
+check("back restores the previous toggle", page.url().includes("source=arxiv") &&
+  await page.$eval('button[data-source="arxiv"]', (b) => b.getAttribute("aria-pressed") === "true"));
+await page.click('button[data-source=""]');
 
 let r = await searchFor("tight security");
 check("search replaces the lists with results", r.titles.includes(F13) && await page.$eval("[data-recent]", (n) => n.hidden), r.count);
@@ -57,15 +56,17 @@ check("exact identifier search", r.titles.length === 1 && r.titles[0] === F01, J
 r = await searchFor("10.9999/nothing-here");
 check("unknown identifier says so", r.titles.length === 0 && r.count.includes("no paper with identifier"), r.count);
 r = await searchFor("zero-knowledge");
-check("long result lists are capped with a note", r.titles.length <= 100 && /\d+ papers?/.test(r.count), r.count);
-await page.click('button[data-area="formal-verification"]');
+await page.waitForFunction(() => !(document.querySelector("[data-count]")?.textContent ?? "").includes("loading"));
+r = { count: await page.textContent("[data-count]"), titles: await visibleTitles("[data-results]") };
+check("search returns every matching paper", r.titles.length === Number.parseInt(r.count, 10) && r.titles.length > 25, r.count);
+await page.click('button[data-source="arxiv"]');
 await page.waitForFunction(() => {
   const t = document.querySelector("[data-count]")?.textContent ?? "";
-  return location.search.includes("area=formal-verification") && t !== "" && !t.startsWith("searching");
+  return location.search.includes("source=arxiv") && t !== "" && !t.startsWith("searching") && !t.includes("loading");
 });
-const fv = await visibleTitles("[data-results]");
-check("toggles also filter search results", fv.length < r.titles.length, `${fv.length} of ${r.titles.length}`);
-await page.click('button[data-area=""]');
+const arx = await visibleTitles("[data-results]");
+check("source toggle also filters search results", arx.length > 0 && arx.length < r.titles.length, `${arx.length} of ${r.titles.length}`);
+await page.click('button[data-source=""]');
 r = await searchFor("tags");
 const unsafe = await page.$$eval("[data-results] li.paper", (lis) => lis.map((li) => ({ text: li.querySelector(".paper-title").textContent, scripts: li.querySelectorAll("script, b, img").length })));
 check("untrusted title text is displayed safely", unsafe.some((u) => u.text.includes("<script>")) && unsafe.every((u) => u.scripts === 0), JSON.stringify(unsafe));

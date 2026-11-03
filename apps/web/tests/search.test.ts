@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-  LatestOnly, MAX_SHOWN, PagefindSearchService, ReleaseMismatchError, emptyState, parseIdentifierQuery,
+  BATCH_SIZE, LatestOnly, PagefindSearchService, ReleaseMismatchError, emptyState, parseIdentifierQuery,
   parseState, serializeState, translate, withChange, type PagefindApi, type SearchFacets, type Vocabulary,
 } from "../src/lib/search";
 
@@ -136,13 +136,32 @@ function fakePagefind(n: number, dataSpy: (id: string) => void, release = "r1"):
 }
 
 describe("SearchService", () => {
-  it("hydrates only the results it shows (at most 100)", async () => {
+  it("returns every match, delivered in batches", async () => {
+    const hydrated: string[] = [];
+    const batches: number[] = [];
+    const service = new PagefindSearchService({ loadPagefind: async () => fakePagefind(260, (id) => hydrated.push(id)), facets, releaseId: "r1" });
+    const result = await service.search({ state: state("q=zero").state, todayUTC: TODAY }, (cards, total) => {
+      batches.push(cards.length);
+      expect(total).toBe(260);
+    });
+    expect(result.total).toBe(260);
+    expect(result.items.map((c) => c.id)).toEqual(Array.from({ length: 260 }, (_, i) => `w${i}`));
+    expect(batches).toEqual([BATCH_SIZE, BATCH_SIZE, BATCH_SIZE, BATCH_SIZE, BATCH_SIZE, 10]);
+    expect(hydrated.length).toBe(260);
+  });
+
+  it("a newer query stops an older one between batches", async () => {
+    const latest = new LatestOnly();
     const hydrated: string[] = [];
     const service = new PagefindSearchService({ loadPagefind: async () => fakePagefind(260, (id) => hydrated.push(id)), facets, releaseId: "r1" });
-    const result = await service.search({ state: state("q=zero").state, todayUTC: TODAY });
-    expect(result.total).toBe(260);
-    expect(result.items.length).toBe(MAX_SHOWN);
-    expect(hydrated.length).toBe(MAX_SHOWN);
+    const old = latest.begin();
+    const delivered: number[] = [];
+    await service.search({ state: state("q=zero").state, todayUTC: TODAY }, (cards) => {
+      delivered.push(cards.length);
+      latest.begin(); // a newer query starts after the first batch
+    }, old.current);
+    expect(delivered).toEqual([BATCH_SIZE]);
+    expect(hydrated.length).toBe(BATCH_SIZE);
   });
 
   it("constrained empty sets never reach Pagefind", async () => {

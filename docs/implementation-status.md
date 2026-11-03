@@ -1,7 +1,7 @@
 # Implementation status
 Current task: T14 (rescoped by user, D017)
 Last completed task: T13
-Confirmed decisions: reader site simplified to a single pqc-reference-style page with search, light violet, no detail/archive/feed/coverage pages for now (user, D017); broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
+Confirmed decisions: reader site simplified to a single pqc-reference-style page with search, light violet, search bar + source toggle only, no tags, no detail/archive/feed/coverage pages for now (user, D017–D018); broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
 
 Nothing in this repository is a completed production project yet. No backfill has
 run, no live provider data has been ingested, and no evaluation has been performed.
@@ -46,7 +46,7 @@ run, no live provider data has been ingested, and no evaluation has been perform
 3. When provider access exists: `sources verify --source eprint --bounded --capture-fixtures tests/fixtures/eprint` then reconcile `docs/source-contracts.md`.
 
 ## External blockers
-- **Provider network access (this sandbox).** The environment's egress policy denies `eprint.iacr.org`, `oaipmh.arxiv.org`, `export.arxiv.org`, `dblp.org`, and `api.crossref.org` (proxy CONNECT 403, observed 2026-11-03). Live verification (T05), the real end-to-end sample (T16), and historical import (T17) cannot run here until those hosts are allowed in the environment's Network access settings, or the jobs run elsewhere (e.g. GitHub Actions). Independent work still possible: all parser, runner, database, classification, export, and UI work using synthetic and clearly labeled fixtures.
+- **Provider network access** was blocked (proxy CONNECT 403) until the user enabled it on 2026-11-03; ePrint, arXiv OAI/Atom, and Crossref now answer 200, DBLP 301 (redirect). Earlier blocker text kept for history: Live verification (T05), the real end-to-end sample (T16), and historical import (T17) cannot run here until those hosts are allowed in the environment's Network access settings, or the jobs run elsewhere (e.g. GitHub Actions). Independent work still possible: all parser, runner, database, classification, export, and UI work using synthetic and clearly labeled fixtures.
 - **ePrint field semantics.** Spec section 23: ePrint original/update/version fields have never been verified against an accessible live response. Still unverified.
 - **DBLP dump / Crossref API.** Same egress block (`dblp.org`, `api.crossref.org`); DBLP import needs a downloaded dump + DTD passed as files.
 - **Docker daemon.** Not running at session start; started manually (`dockerd`). Needs restarting in a new session.
