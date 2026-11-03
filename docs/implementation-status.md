@@ -1,6 +1,6 @@
 # Implementation status
-Current task: T12
-Last completed task: T11
+Current task: T13
+Last completed task: T12
 Confirmed decisions: broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
 
 Nothing in this repository is a completed production project yet. No backfill has
@@ -20,7 +20,7 @@ run, no live provider data has been ingested, and no evaluation has been perform
 | T09 | done | `resolve/{events,curation,review}.py`, `curate validate/apply`, `review export`, migration 0004; 19 PostgreSQL tests (verification report T09) | — |
 | T10 | done | `adapters/{dblp,crossref,curated}.py`, `config/venues.yaml`, `ingest/historical.py`, `run_snapshot`, `backfill --source dblp`, `import-curated`, `enrich-dois`, migration 0005; 11 PostgreSQL tests on synthetic inputs (verification report T10) | No real dump/API response processed (host blocked); `foundations.jsonl` intentionally empty until entries are verified (T17) |
 | T11 | done | `models/public.py`, `publish/{snapshot,export,feeds,bibtex,validate,fixture}.py`, `release export/validate`, `make fixture-export`, schema export; fixture release validates; 15 tests (verification report T11) | Real-data release blocked until live sources run |
-| T12 | not_started | — | — |
+| T12 | done | `apps/web` (Astro 7 static output, components per spec 15, base-path-aware URLs, preview label, schema/base-path guards); 31 Vitest tests; crawl at `/` and `/proof-papers/` with 0 broken links/overflow/errors (verification report T12) | Math rendering and citation polish in T14; keyboard/a11y review in T19 |
 | T13 | not_started | — | — |
 | T14 | not_started | — | — |
 | T15 | not_started | — | — |
@@ -41,8 +41,8 @@ run, no live provider data has been ingested, and no evaluation has been perform
 - PostgreSQL 17.11 (`postgres:17` Docker image); Docker 29.9.2 with Compose v5.6.1
 
 ## Next actions
-1. T12: Astro static reading UI from an exported release (`CATALOG_DIR`): header, freshness banner, cards, detail pages, archive/topic/foundations pagination, responsive CSS tokens, preview label, base-path-aware URLs; `make web-build`/`web-preview`.
-2. T12 gate: working preview from the fixture release; primary pages usable without dynamic search.
+1. T13: Pagefind index over canonical paper pages only (weights, facets, date tokens, sort ranks), `SearchService` adapter (explicit `any` OR, facet AND, date-token selection, exact identifier search, hydration of only the requested page, sequence guard), URL state, client `renderPaperCard()`.
+2. T13 gate: real-index tests for OR/AND, dates, source dedup, unknown dates, exact ID, pagination.
 3. When provider access exists: `sources verify --source eprint --bounded --capture-fixtures tests/fixtures/eprint` then reconcile `docs/source-contracts.md`.
 
 ## External blockers

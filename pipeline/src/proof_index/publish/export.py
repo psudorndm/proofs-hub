@@ -586,6 +586,21 @@ def _write_release(
     )
     _write_facets(root, papers, release_id, ranks(papers))
     _dump(
+        root / "taxonomy.json",
+        {
+            "release_id": release_id,
+            "version": taxonomy.version,
+            "areas": [{"id": a.id, "display_name": a.display_name} for a in taxonomy.areas],
+            "topics": [
+                {"id": tp.id, "display_name": tp.display_name, "areas": list(tp.areas)}
+                for tp in taxonomy.topics
+            ],
+            "contributions": [
+                {"id": c.id, "display_name": c.display_name} for c in taxonomy.contributions
+            ],
+        },
+    )
+    _dump(
         root / "aliases.json",
         {"release_id": release_id, "aliases": dict(sorted(snapshot.aliases.items()))},
     )

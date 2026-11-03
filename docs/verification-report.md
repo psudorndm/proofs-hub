@@ -283,3 +283,25 @@ last both ways; withdrawn source with active counterpart; `test_untrusted_title_
 and forbidden keys detected; `test_new_and_updated_feeds_have_stable_unique_ids`;
 no overwrite of an existing release; `test_partial_promotion_blocks_export`; non-root
 base path in canonical/JSON/feed URLs; `test_bibtex_escapes_special_characters_and_preserves_author_order`.
+
+## T12 — Static reading UI (2026-11-03)
+
+```text
+$ cd apps/web && npm ci                       -> 0 vulnerabilities (npm audit)
+$ CATALOG_DIR=work/releases/fixture-preview npm run check   -> astro check: 0 errors; tsc clean
+$ CATALOG_DIR=... npm test                     -> 31 passed (card model, dates, URLs, contract keys
+                                                  vs exported schemas, runtime validation of every
+                                                  fixture paper, WCAG AA token contrast light+dark)
+$ CATALOG_DIR=... npm run build                -> 47 page(s) built
+$ PUBLIC_BASE_PATH=/proof-papers/ (release exported for /proof-papers/) npm run build -> 47 pages
+$ build with a release exported for another base path -> prepare-catalog refuses
+```
+
+Browser check (Playwright Chromium against `astro preview` of the real build):
+crawled 43 internal URLs at `/` and 43 at `/proof-papers/`: 0 broken links, 0 pages
+wider than the viewport at 1280 px and 390 px, 0 console/page errors; no built HTML
+link escapes the base path. Screenshots of the home page (desktop and mobile) and a
+detail page were reviewed: preview label, freshness and coverage notes, area tabs,
+view tabs, card badges, withdrawn-source note, sources table, inclusion evidence,
+and history render as specified. Keyboard-only and screen-reader checks are not yet
+done (T19).

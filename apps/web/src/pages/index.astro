@@ -1,0 +1,6 @@
+---
+import ListView from "../components/ListView.astro";
+import { listPages } from "../lib/catalog";
+const [page] = listPages("lists/new");
+---
+<ListView page={page!} prefix="new" view="new" heading="New papers" context={`last ${page!.window_days} days, newest first`} />

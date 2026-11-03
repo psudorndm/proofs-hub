@@ -33,5 +33,19 @@ make db-up
 uv run proof-index doctor --check-db
 ```
 
-`make test` runs the unit tests. Database tests and the remaining commands are added
-as their tasks land; see the status file.
+`make test` runs the unit tests; `make test-db` runs everything against disposable
+PostgreSQL databases on the Compose server.
+
+## Preview the reader site
+
+```bash
+make fixture-export
+```
+
+```bash
+make web-preview
+```
+
+The fixture release is built from synthetic test cases and every page shows
+“Preview dataset — not the live research index.” To build from a real export, pass
+`CATALOG_DIR=work/releases/<release-id>` to `make web-build`.

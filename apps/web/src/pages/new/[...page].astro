@@ -1,0 +1,9 @@
+---
+import ListView from "../../components/ListView.astro";
+import { listPages } from "../../lib/catalog";
+import { pagedPaths } from "../../lib/paths";
+import type { ListPage } from "../../lib/contracts";
+export function getStaticPaths() { return pagedPaths(listPages("lists/new")); }
+const { page } = Astro.props as { page: ListPage };
+---
+<ListView page={page} prefix="new" view="new" title="New papers" heading="New papers" context={`last ${page.window_days} days, newest first`} />

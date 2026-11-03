@@ -1,0 +1,12 @@
+---
+import Base from "../../layouts/Base.astro";
+import SearchPanel from "../../components/SearchPanel.astro";
+import { withBase } from "../../lib/urls";
+---
+<Base title="Search" canonicalPath={withBase("search/")}>
+  <SearchPanel view="search" />
+  <section class="results" aria-labelledby="results-heading" data-search-results>
+    <div class="list-head"><h2 id="results-heading">Search</h2><p class="meta" aria-live="polite" data-result-count></p></div>
+    <noscript><p class="empty">Search needs JavaScript. You can still <a href={withBase("archive/")}>browse the archive</a>, <a href={withBase("topics/")}>topics</a>, and <a href={withBase("foundations/")}>foundations</a>.</p></noscript>
+  </section>
+</Base>

@@ -1,0 +1,8 @@
+---
+import Base from "../layouts/Base.astro";
+import { withBase } from "../lib/urls";
+---
+<Base title="Not found" noindex>
+  <h1>Page not found</h1>
+  <p>Try the <a href={withBase("")}>main index</a> or the <a href={withBase("archive/")}>archive</a>.</p>
+</Base>

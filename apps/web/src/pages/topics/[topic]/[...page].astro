@@ -1,0 +1,13 @@
+---
+import ListView from "../../../components/ListView.astro";
+import { listPages, taxonomy } from "../../../lib/catalog";
+import { pagedPaths } from "../../../lib/paths";
+import { labelFor } from "../../../lib/format";
+import type { ListPage } from "../../../lib/contracts";
+export function getStaticPaths() {
+  return taxonomy().topics.flatMap((t) => pagedPaths(listPages(`topics/${t.id}`), { topic: t.id }));
+}
+const { page, topic } = Astro.props as { page: ListPage; topic: string };
+const name = labelFor(taxonomy(), "topics", topic);
+---
+<ListView page={page} prefix={`topics/${topic}`} view="archive" title={name} heading={name} context="newest first" />

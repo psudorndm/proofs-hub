@@ -233,3 +233,21 @@ only adds load and delay.
   `rank_newest/oldest/updated`, `publication_period`, `update_period`, identifiers).
 - The export writes into a temporary sibling directory and renames it into place;
   an existing release directory is never overwritten.
+
+## D015 — Frontend toolchain pins (T12)
+
+- Astro 7.3.8, TypeScript 6.0.3, Ajv 8.20.0, KaTeX 0.19.0, Pagefind 1.5.2,
+  Vitest 4.1.12, jsdom 30.1.2, @astrojs/check 0.9.10, @types/node 22.20.5 — exact
+  versions, each published before 2026-10-20 (two-week minimum age).
+- npm 10.9.9 (bundled with Node 22.23.4) crashes in arborist (`Cannot read
+  properties of null (reading 'edgesOut')`) while resolving Vitest ≥ 4.1.10's
+  optional peer graph (`msw` → `typescript >= 4.8.x`). Vitest 4.0.18 avoided the
+  crash but carries a critical advisory (GHSA-qxg6-89mg-rqv8), so it was rejected.
+  `apps/web/.npmrc` sets `legacy-peer-deps=true`; with it the locked tree installs
+  via `npm ci`, `npm audit` reports 0 vulnerabilities, and the only unmet entries are
+  optional platform bindings. Revisit when npm is upgraded.
+- The build reads exactly one validated release (`CATALOG_DIR`), refuses a release
+  exported for a different `PUBLIC_BASE_PATH` or with a different public schema,
+  and copies release assets to `assets/releases/<release-id>/` (plus up to two
+  previous releases via `PREVIOUS_CATALOG_DIRS`).
+- Astro 7's `astro preview` runs a managed background server (`astro preview stop`).

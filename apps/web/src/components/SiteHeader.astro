@@ -1,0 +1,19 @@
+---
+import { manifest } from "../lib/catalog";
+import { withBase } from "../lib/urls";
+const m = manifest();
+---
+<header class="site-header">
+  <div class="container">
+    <div class="bar">
+      <p class="site-title"><a href={withBase("")}>{m.site_title}</a></p>
+      <nav class="site-nav" aria-label="Site">
+        <a href={withBase("about/")}>About</a>
+        <a href={withBase("coverage/")}>Coverage</a>
+        <a href={withBase("status/")}>Status</a>
+        <a href={withBase("feeds/new.atom")}>RSS</a>
+      </nav>
+    </div>
+    <p class="site-scope">Proof systems, security proofs, and formal verification</p>
+  </div>
+</header>

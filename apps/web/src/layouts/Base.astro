@@ -1,0 +1,46 @@
+---
+import "../styles/global.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import FreshnessBanner from "../components/FreshnessBanner.astro";
+import { manifest } from "../lib/catalog";
+import { withBase } from "../lib/urls";
+
+interface Props { title?: string; description?: string; canonicalPath?: string; noindex?: boolean }
+const { title, description, canonicalPath, noindex = false } = Astro.props;
+const m = manifest();
+const pageTitle = title ? `${title} · ${m.site_title}` : m.site_title;
+const canonical = canonicalPath ? new URL(canonicalPath, m.public_site_url).toString() : undefined;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description ?? m.site_description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {(noindex || m.dataset_mode === "fixture") && <meta name="robots" content="noindex" />}
+    <link rel="alternate" type="application/atom+xml" title="New papers" href={withBase("feeds/new.atom")} />
+    <link rel="alternate" type="application/atom+xml" title="Updated papers" href={withBase("feeds/updated.atom")} />
+    <meta name="proof-index-release" content={m.release_id} />
+    <meta name="proof-index-base" content={withBase("")} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <div class="container"><FreshnessBanner /></div>
+    <main id="main" class="container">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Release <span class="mono">{m.release_id}</span> · rules {m.rules_version} ·
+          snapshot {m.catalog_snapshot_at.slice(0, 10)} ·{" "}
+          <a href={withBase("about/")}>About and inclusion policy</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

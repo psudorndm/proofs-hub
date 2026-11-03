@@ -1,0 +1,23 @@
+---
+import Base from "../layouts/Base.astro";
+import { manifest } from "../lib/catalog";
+import { withBase } from "../lib/urls";
+const m = manifest();
+---
+<Base title="About" canonicalPath={withBase("about/")}>
+  <article class="detail">
+    <h1>About this index</h1>
+    <p>{m.site_description}</p>
+    <h2>Scope</h2>
+    <p>Three primary areas: cryptographic proof systems; security proofs and cryptographic protocol analysis; and formal verification of cryptographic designs and implementations. Coverage is meant to include the full available history, including foundational papers, with no year cutoff.</p>
+    <h2>Sources</h2>
+    <p>Metadata comes from the IACR Cryptology ePrint Archive, arXiv, DBLP, Crossref, and a version-controlled curated collection. Each paper page lists every source record, its identifier and version, and links to the source. Coverage and refresh status are on the <a href={withBase("coverage/")}>Coverage</a> and <a href={withBase("status/")}>Status</a> pages.</p>
+    <h2>How papers are included</h2>
+    <p>Inclusion uses deterministic, versioned rules ({m.rules_version}) over titles and abstracts, which look for evidence in specific groups (for example a proof-system term together with independent cryptographic context). Uncertain records go to review instead of being dropped or published. Each paper page explains why it was included and quotes the matched text. Labels marked “automatic” come from the rules; “provisional” labels were prepared by an agent and have not been reviewed by a person; “human-reviewed” means a person reviewed them.</p>
+    <h2>Dates</h2>
+    <p>The original publication date is the earliest date supported by the sources. When a source gives only a year or month, the index shows exactly that (for example “1985 · publication year only”) and never invents a day. Rolling windows such as “Last 30 days” only include day-precision dates.</p>
+    <h2>What this index does not do</h2>
+    <p>No reader accounts, notes, email subscriptions, AI summaries, citation rankings, or PDF hosting. Abstracts are shown as supplied by the sources; when none exists the page says so.</p>
+    {m.dataset_mode === "fixture" && <p class="banner banner-preview">This build uses a synthetic preview dataset. Its papers, authors, and identifiers are invented test cases.</p>}
+  </article>
+</Base>

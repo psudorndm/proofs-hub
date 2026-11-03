@@ -1,5 +1,5 @@
 # Thin wrappers around documented commands. Each target runs a real command.
-.PHONY: setup db-up db-down doctor migrate test test-db fixture-export schema lint typecheck check
+.PHONY: setup db-up db-down doctor migrate test test-db fixture-export schema web-build web-preview web-test lint typecheck check
 
 UV ?= uv
 COMPOSE ?= docker compose
@@ -35,6 +35,17 @@ fixture-export:
 
 schema:
 	$(UV) run python scripts/export-schema.py
+
+# Static site from one validated release: make web-build CATALOG_DIR=work/releases/<id>
+CATALOG_DIR ?= $(CURDIR)/$(FIXTURE_RELEASE)
+web-build:
+	cd apps/web && npm ci && CATALOG_DIR=$(abspath $(CATALOG_DIR)) npm run build
+
+web-preview: web-build
+	cd apps/web && npx astro preview --host 127.0.0.1
+
+web-test:
+	cd apps/web && CATALOG_DIR=$(abspath $(CATALOG_DIR)) npm run check && CATALOG_DIR=$(abspath $(CATALOG_DIR)) npm test
 
 lint:
 	$(UV) run ruff check pipeline tests scripts db

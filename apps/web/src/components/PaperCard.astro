@@ -1,0 +1,26 @@
+---
+import type { PaperCardData, Taxonomy } from "../lib/contracts";
+import { ABSTRACT_UNAVAILABLE, cardModel } from "../lib/format";
+interface Props { card: PaperCardData; taxonomy: Taxonomy; abstract: string | null }
+const { card, taxonomy, abstract } = Astro.props;
+const m = cardModel(card, taxonomy);
+---
+<article class="paper-card" data-paper-id={m.id}>
+  <h3 class="paper-title"><a href={m.href}>{m.title}</a></h3>
+  <p class="paper-meta">
+    {m.authors} · <span class:list={{ approx: m.approximateDate }}>{m.date}</span>{m.venue && <> · {m.venue}</>}
+  </p>
+  <ul class="paper-tags">
+    {m.badges.map((b) => <li class={b.className}>{b.label}</li>)}
+    <li class="badge badge-contribution">{m.contribution}</li>
+    {m.foundational && <li class="badge badge-foundational">Foundational</li>}
+    {m.statusNote && <li class="badge badge-status">{m.statusNote}</li>}
+  </ul>
+  <p class="paper-links">
+    {m.links.map((l) => <a href={l.href} data-kind={l.kind} rel={l.kind === "cite" || l.kind === "code" ? undefined : "noopener"}>{l.label}</a>)}
+  </p>
+  <details class="abstract">
+    <summary>Show abstract</summary>
+    <p data-math>{abstract ?? ABSTRACT_UNAVAILABLE}</p>
+  </details>
+</article>
