@@ -262,7 +262,7 @@ def classify(
     from proof_index.classify.store import classify_current
     from proof_index.db.locks import CATALOG_WRITER, advisory_lock
     from proof_index.errors import InputError
-    from proof_index.ingest.service import Pipeline, classification_hook
+    from proof_index.ingest.service import Pipeline, classification_hook, identity_resolver
 
     if changed == all_records:
         raise InputError("pass exactly one of --changed or --all")
@@ -275,8 +275,15 @@ def classify(
             f"--rules-version {rules_version} does not match the configured rules file "
             f"({hook.classifier.version})"
         )
+    resolver = identity_resolver(pipeline, hook.classifier.version)
+
+    def after(conn: Any, record_id: Any) -> None:
+        work_id = resolver.ensure_work(conn, record_id)
+        if work_id is not None:
+            resolver.rebuild(conn, work_id)
+
     with advisory_lock(pipeline.engine, CATALOG_WRITER):
-        report = classify_current(pipeline.engine, hook, only_missing=changed)
+        report = classify_current(pipeline.engine, hook, only_missing=changed, after=after)
     emit(
         {
             "command": "classify",

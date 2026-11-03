@@ -24,7 +24,7 @@ from sqlalchemy import (
     UniqueConstraint,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB, TIMESTAMP, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TIMESTAMP, UUID
 
 NAMING = {
     "ix": "ix_%(table_name)s_%(column_0_N_name)s",
@@ -180,6 +180,11 @@ source_records = Table(
     Column("work_id", UUID(as_uuid=True), ForeignKey("works.id"), nullable=True),
     Column("first_seen_at", TS, nullable=False),
     Column("last_seen_at", TS, nullable=False),
+    # Additive identity keys, maintained from the current observation (T08).
+    Column("title_key", Text, nullable=True),
+    Column("title_tokens", ARRAY(Text), nullable=True),
+    Column("doi", Text, nullable=True),
+    Column("explicit_refs", ARRAY(Text), nullable=True),
     UniqueConstraint("source", "source_id"),
     CheckConstraint(_in("source", SOURCES), name="source"),
     # The current observation must belong to this record (composite FK, added after
@@ -191,6 +196,10 @@ source_records = Table(
         use_alter=True,
     ),
     Index("ix_source_records_work_id", "work_id"),
+    Index("ix_source_records_title_key", "title_key"),
+    Index("ix_source_records_doi", "doi"),
+    Index("ix_source_records_title_tokens", "title_tokens", postgresql_using="gin"),
+    Index("ix_source_records_explicit_refs", "explicit_refs", postgresql_using="gin"),
     Index("ix_source_records_current_observation_id", "current_observation_id"),
 )
 

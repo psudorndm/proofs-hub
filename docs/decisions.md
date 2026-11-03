@@ -141,3 +141,26 @@ only adds load and delay.
   the current observation's reuses it (no new observation), so bookkeeping-only
   re-exports do not grow history.
 - **Lock order** is provider lock, then catalog-writer lock (promotion only).
+
+## D011 — Identity resolution details (T08)
+
+- Identity keys (`title_key`, `title_tokens`, `doi`, `explicit_refs`) are columns on
+  `source_records` with B-tree/GIN indexes (migration 0003), refreshed from each new
+  current observation. Exact-title lookup needs an index even without `pg_trgm`.
+- Explicit cross-source references are matched in both directions (a record's own
+  references, and other records that reference it), so arrival order does not
+  matter (F02 before F01 still merges).
+- Compatibility for explicit-ID and DOI matches: title-token Jaccard ≥ 0.5 (or
+  equal title keys) and at least one shared author when both sides list authors.
+  A DOI shared with an incompatible record is a review, never a merge (proceedings DOIs).
+- Every review-only outcome still gives the record its own work; the review row
+  links it to the candidate so a curator can merge. Records already attached to a
+  work are never moved automatically.
+- Similarity candidates use prefix filtering on sorted meaningful title tokens
+  (GIN overlap), then exact Jaccard ≥ 0.85 in Python.
+- Canonical publication-date conflicts are flagged
+  (`publication_dates_differ_across_sources`) only when day-precision dates from
+  different sources are more than 30 days apart; small preprint/journal offsets
+  are normal and not flagged.
+- `canonical_revision` increments only when `CanonicalWork.public_hash()` changes;
+  provenance and observation-ID changes alone do not count.

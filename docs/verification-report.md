@@ -194,3 +194,21 @@ uppercase-only STARK, contributions (including "no fabricated type"), normalized
 offsets, override precedence, taxonomy validation of rule topics. PostgreSQL tests:
 promotion hook writes classification rows (tombstones skipped); `--changed` fills
 only missing rows; `--all` recomputation is deterministic.
+
+## T08 — Identity and canonical work projection (2026-11-03)
+
+```text
+$ make test-db                 -> 233 passed (13 identity tests on PostgreSQL 17)
+$ uv run ruff check; uv run mypy (56 files) -> clean; migration head 0003
+```
+
+Covered on synthetic cases: F01+F02 merge through the explicit ePrint reference
+(both arrival orders); F10 stays separate; identical rerun preserves work IDs and
+`canonical_revision`; `test_title_author_match_requires_unique_candidate_and_no_conflicts`
+(same title+authors attaches; different authors → separate work + review; two
+candidate works → no attach); conflicting DOI blocks title+author attach; short
+titles (<5 meaningful tokens) need identifiers;
+`test_shared_proceedings_doi_does_not_merge_unrelated_papers`; excluded F06 has no
+work; review F08 gets a `review` work; F13+F16 withdrawn counterpart keeps the work
+active with per-source withdrawal; revision increments only on public change;
+missing abstract and unknown date retained.

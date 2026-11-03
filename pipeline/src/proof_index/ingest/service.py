@@ -21,6 +21,8 @@ from proof_index.http.rate_limit import Budget, LimiterRegistry
 from proof_index.ingest.hooks import HookChain, PromotionHooks
 from proof_index.ingest.runner import RESUMABLE_STATES, HarvestRunner, RunSummary
 from proof_index.models.classification import load_taxonomy
+from proof_index.resolve.canonical import CanonicalBuilder
+from proof_index.resolve.identity import IdentityResolver
 from proof_index.settings import Settings
 from proof_index.storage.factory import make_blob_store
 
@@ -79,9 +81,15 @@ def classification_hook(pipeline: Pipeline) -> ClassificationHook:
     return ClassificationHook(Classifier(rules), pipeline.clock, crypto_venue_keys())
 
 
+def identity_resolver(pipeline: Pipeline, rules_version: str) -> IdentityResolver:
+    builder = CanonicalBuilder(pipeline.clock, rules_version)
+    return IdentityResolver(pipeline.clock, rules_version, builder.rebuild)
+
+
 def default_hooks(pipeline: Pipeline) -> PromotionHooks:
-    """Classification, then identity and events (T08–T09 extend the chain)."""
-    return HookChain(classification_hook(pipeline))
+    """Classification, then identity resolution and canonical rebuild."""
+    classify_hook = classification_hook(pipeline)
+    return HookChain(classify_hook, identity_resolver(pipeline, classify_hook.classifier.version))
 
 
 def select_streams(
