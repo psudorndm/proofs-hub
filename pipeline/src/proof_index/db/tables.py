@@ -299,7 +299,7 @@ curation_commands = Table(
     Column(
         "reverts_command_id",
         UUID(as_uuid=True),
-        ForeignKey("curation_commands.id"),
+        ForeignKey("curation_commands.id", deferrable=True, initially="DEFERRED"),
         nullable=True,
     ),
     # Additive: the YAML command_id; reuse with different content is an error.
@@ -344,7 +344,7 @@ work_events = Table(
     Column(
         "curation_command_id",
         UUID(as_uuid=True),
-        ForeignKey("curation_commands.id"),
+        ForeignKey("curation_commands.id", deferrable=True, initially="DEFERRED"),
         nullable=True,
     ),
     Column("source_record_id", UUID(as_uuid=True), ForeignKey("source_records.id"), nullable=True),
@@ -435,7 +435,12 @@ source_assignment_overrides = Table(
         primary_key=True,
     ),
     Column("target_work_id", UUID(as_uuid=True), ForeignKey("works.id"), nullable=False),
-    Column("command_id", UUID(as_uuid=True), ForeignKey("curation_commands.id"), nullable=False),
+    Column(
+        "command_id",
+        UUID(as_uuid=True),
+        ForeignKey("curation_commands.id", deferrable=True, initially="DEFERRED"),
+        nullable=False,
+    ),
     Index("ix_source_assignment_overrides_target_work_id", "target_work_id"),
     Index("ix_source_assignment_overrides_command_id", "command_id"),
 )
@@ -445,7 +450,12 @@ separation_constraints = Table(
     metadata,
     Column("work_a", UUID(as_uuid=True), ForeignKey("works.id"), nullable=False),
     Column("work_b", UUID(as_uuid=True), ForeignKey("works.id"), nullable=False),
-    Column("command_id", UUID(as_uuid=True), ForeignKey("curation_commands.id"), nullable=False),
+    Column(
+        "command_id",
+        UUID(as_uuid=True),
+        ForeignKey("curation_commands.id", deferrable=True, initially="DEFERRED"),
+        nullable=False,
+    ),
     PrimaryKeyConstraint("work_a", "work_b"),
     CheckConstraint("work_a < work_b", name="sorted_distinct_pair"),
     Index("ix_separation_constraints_work_b", "work_b"),

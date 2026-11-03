@@ -263,6 +263,7 @@ def classify(
     from proof_index.db.locks import CATALOG_WRITER, advisory_lock
     from proof_index.errors import InputError
     from proof_index.ingest.service import Pipeline, classification_hook, identity_resolver
+    from proof_index.resolve.events import sync_publication_event
 
     if changed == all_records:
         raise InputError("pass exactly one of --changed or --all")
@@ -278,9 +279,13 @@ def classify(
     resolver = identity_resolver(pipeline, hook.classifier.version)
 
     def after(conn: Any, record_id: Any) -> None:
-        work_id = resolver.ensure_work(conn, record_id)
-        if work_id is not None:
-            resolver.rebuild(conn, work_id)
+        assignment = resolver.ensure_work(conn, record_id)
+        if assignment.work_id is not None:
+            result = resolver.rebuild(conn, assignment.work_id)
+            # Reclassification creates no reader-visible update events; only the
+            # work-level publication event is kept in sync.
+            if result.canonical is not None:
+                sync_publication_event(conn, assignment.work_id, result.canonical, pipeline.clock)
 
     with advisory_lock(pipeline.engine, CATALOG_WRITER):
         report = classify_current(pipeline.engine, hook, only_missing=changed, after=after)
@@ -300,6 +305,67 @@ def classify(
         from proof_index.errors import DataValidationError
 
         raise DataValidationError(f"{len(report.mismatched)} stored classifications differ")
+
+
+curate_app = typer.Typer(help="Validate and apply curator commands.", no_args_is_help=True)
+app.add_typer(curate_app, name="curate")
+
+
+def _curation_service() -> tuple[Any, Any]:
+    from proof_index.ingest.service import Pipeline, classification_hook
+    from proof_index.models.classification import load_taxonomy
+    from proof_index.resolve.canonical import CanonicalBuilder
+    from proof_index.resolve.curation import CurationService, load_curation_state
+
+    pipeline = Pipeline.from_settings(load_settings())
+    version = classification_hook(pipeline).classifier.version
+    builder = CanonicalBuilder(pipeline.clock, version, load_curation_state)
+    taxonomy = load_taxonomy(Path("config/taxonomy.yaml"))
+    return pipeline, CurationService(pipeline.clock, builder, taxonomy)
+
+
+@curate_app.command("validate")
+@handle_errors
+def curate_validate(path: Path = typer.Argument(..., exists=False)) -> None:
+    """Validate a command file against the schema and current revisions (no writes)."""
+    from proof_index.models.classification import load_taxonomy
+    from proof_index.resolve.curation import load_command_file
+
+    command = load_command_file(path, load_taxonomy(Path("config/taxonomy.yaml")))
+    pipeline, service = _curation_service()
+    with pipeline.engine.connect() as conn:
+        emit(service.validate(conn, command), True)
+
+
+@curate_app.command("apply")
+@handle_errors
+def curate_apply(path: Path = typer.Argument(...)) -> None:
+    """Apply a command transactionally under the catalog-writer lock."""
+    from proof_index.db.locks import CATALOG_WRITER, advisory_lock
+    from proof_index.db.repository import transaction
+    from proof_index.resolve.curation import load_command_file
+
+    pipeline, service = _curation_service()
+    command = load_command_file(path, service.taxonomy)
+    with advisory_lock(pipeline.engine, CATALOG_WRITER), transaction(pipeline.engine) as conn:
+        result = service.apply(conn, command)
+    emit(result, True)
+
+
+review_app = typer.Typer(help="Review queues.", no_args_is_help=True)
+app.add_typer(review_app, name="review")
+
+
+@review_app.command("export")
+@handle_errors
+def review_export(out: Path = typer.Option(Path("work/review.jsonl"), "--out")) -> None:
+    """Export works awaiting relevance review and pending identity reviews as JSONL."""
+    from proof_index.ingest.service import Pipeline
+    from proof_index.resolve.review import export_reviews
+
+    pipeline = Pipeline.from_settings(load_settings())
+    counts = export_reviews(pipeline.engine, out)
+    emit({"command": "review export", "out": str(out), **counts}, True)
 
 
 @app.callback()

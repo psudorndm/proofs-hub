@@ -164,3 +164,28 @@ only adds load and delay.
   are normal and not flagged.
 - `canonical_revision` increments only when `CanonicalWork.public_hash()` changes;
   provenance and observation-ID changes alone do not count.
+
+## D012 — Event and curation details (T09)
+
+- **arXiv OAI revisions.** The `arXiv` OAI format has no version numbers. When both
+  the previous and new arXiv observations lack versions but `updated` advanced, the
+  change counts as a `source_revision` dated by `updated` (arXiv sets `updated`
+  only for new versions — an assumption until verified live). Elsewhere a revision
+  needs an advancing `vN`.
+- **New-list eligibility** is decided at export from the publication event's
+  day-precision date and the recent window, so discovery time never matters.
+  `metadata_updated` events fire only when the work's public canonical hash
+  changed; bootstrap/backfill runs never create observed-date update events.
+- **Withdrawal** covers both explicit `withdrawn` status and provider deletion
+  tombstones (`details.to = "deleted"`); absence from a response is never withdrawal.
+- **Curation state** (include, exclude, set_labels, set_fields) is folded from the
+  active, non-reverted command list at every rebuild. Reverting a revert is refused;
+  apply a new command instead. State commands addressed to an absorbed work stop
+  applying after a merge (they are not re-targeted automatically).
+- **Deferrable FKs** (migration 0004): overrides, separation constraints, and
+  events reference the immutable command row, which is inserted last in the same
+  transaction once its after-state is known.
+- **Revert precondition:** current source-record/publication assignments and
+  `merged_into` of every involved work must equal the original after-state;
+  canonical revisions may differ (later independent observations are preserved).
+  A split's new works become aliases of the original work on revert.

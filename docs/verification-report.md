@@ -212,3 +212,29 @@ titles (<5 meaningful tokens) need identifiers;
 work; review F08 gets a `review` work; F13+F16 withdrawn counterpart keeps the work
 active with per-source withdrawal; revision increments only on public change;
 missing abstract and unknown date retained.
+
+## T09 — Events and curation (2026-11-03)
+
+```text
+$ make test-db                 -> 252 passed (19 event/curation tests on PostgreSQL 17)
+$ uv run ruff check; uv run mypy (59 files) -> clean; migration head 0004
+$ uv run proof-index review export --out work/review.jsonl
+    {"identity_reviews": 0, "relevance_reviews": 0}   (local catalog is empty)
+```
+
+Events: F03 after a baseline F02 yields exactly one `source_revision` dated
+2020-03-01 (source basis) and keeps the publication date; rerun creates nothing;
+`test_source_added_does_not_reset_original_publication` (and the publication date is
+corrected to the earliest supported date); bootstrap first observation creates only
+the publication event; metadata update after a baseline is `metadata_updated` with
+observed basis; no observed event during bootstrap; whitespace-only change creates
+no event; withdrawal and restoration events; event keys unique and stable.
+Curation: include is idempotent and command-ID reuse with different content
+conflicts; `test_stale_curation_revision_rejects_write`; set_fields wins with
+curation provenance; unknown label IDs rejected; merge moves sources and records
+overrides; `test_merge_aliases_are_acyclic_and_resolve_to_live_work`;
+`test_manual_split_survives_reclassification_and_resolution` (and a later merge is
+blocked by the separation constraint); split requires complete assignments;
+revert of include restores the automatic decision and double revert is refused;
+`test_revert_preserves_later_independent_source_observations`; relate and
+non-feed curation events.

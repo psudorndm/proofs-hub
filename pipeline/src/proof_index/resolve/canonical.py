@@ -426,13 +426,19 @@ class CanonicalBuilder:
         self.rules_version = rules_version
         self.curation_loader = curation_loader
 
-    def rebuild(self, conn: Connection, work_id: uuid.UUID) -> RebuildResult:
+    def rebuild(
+        self, conn: Connection, work_id: uuid.UUID, pending: list[dict[str, Any]] | None = None
+    ) -> RebuildResult:
         work = conn.execute(select(t.works).where(t.works.c.id == work_id).with_for_update()).one()
         previous = dict(work.canonical or {})
         if work.merged_into is not None:
             return RebuildResult(work_id, False, work.canonical_revision, None, previous)
         members = _members(conn, work_id, self.rules_version)
-        curation = self.curation_loader(conn, work_id) if self.curation_loader else CurationState()
+        curation = (
+            self.curation_loader(conn, work_id, pending)
+            if self.curation_loader
+            else CurationState()
+        )
         canonical = build_canonical(
             members,
             _publications(conn, work_id, members),

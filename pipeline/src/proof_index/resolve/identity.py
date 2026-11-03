@@ -27,8 +27,6 @@ from proof_index.normalize.identifiers import qualified_identifier
 from proof_index.normalize.text import meaningful_title_tokens, title_key
 from proof_index.resolve import candidates as c
 
-AttachHook = Callable[[Connection, uuid.UUID, uuid.UUID, bool], None]
-
 
 @dataclass
 class Resolution:
@@ -231,6 +229,16 @@ def current_decision(
     ).scalar_one_or_none()
 
 
+@dataclass(frozen=True)
+class Assignment:
+    work_id: uuid.UUID | None
+    newly_attached: bool = False
+    new_work: bool = False
+
+
+ChangeCallback = Callable[[Connection, CurrentChange, uuid.UUID, bool, Any], None]
+
+
 class IdentityResolver:
     """Assign works to records and rebuild affected canonical projections."""
 
@@ -239,26 +247,26 @@ class IdentityResolver:
         clock: Clock,
         rules_version: str,
         rebuild: Callable[[Connection, uuid.UUID], Any],
-        on_attach: AttachHook | None = None,
+        on_change: ChangeCallback | None = None,
     ) -> None:
         self.clock = clock
         self.rules_version = rules_version
         self.rebuild = rebuild
-        self.on_attach = on_attach
+        self.on_change = on_change
 
-    def ensure_work(self, conn: Connection, record_id: uuid.UUID) -> uuid.UUID | None:
+    def ensure_work(self, conn: Connection, record_id: uuid.UUID) -> Assignment:
         """Resolve a record without a work if its classification makes it visible."""
         row = conn.execute(
             select(t.source_records.c.work_id).where(t.source_records.c.id == record_id)
         ).one()
         if row.work_id is not None:
-            return c.resolve_live(conn, row.work_id)
+            return Assignment(c.resolve_live(conn, row.work_id))
         record = c.current_record(conn, record_id)
         if record is None:
-            return None
+            return Assignment(None)
         decision = current_decision(conn, record_id, record.content_sha256(), self.rules_version)
         if decision not in ("include", "review") and not self._has_override(conn, record_id):
-            return None
+            return Assignment(None)
         resolution = resolve_record(conn, record_id, record)
         _queue_reviews(conn, record_id, resolution.reviews, self.clock)
         is_new = resolution.work_id is None
@@ -268,9 +276,7 @@ class IdentityResolver:
             .where(t.source_records.c.id == record_id)
             .values(work_id=work_id)
         )
-        if self.on_attach is not None:
-            self.on_attach(conn, work_id, record_id, is_new)
-        return work_id
+        return Assignment(work_id, newly_attached=True, new_work=is_new)
 
     def _has_override(self, conn: Connection, record_id: uuid.UUID) -> bool:
         return (
@@ -284,6 +290,10 @@ class IdentityResolver:
 
     def current_changed(self, conn: Connection, change: CurrentChange) -> None:
         c.update_identity_keys(conn, change.source_record_id, change.item)
-        work_id = self.ensure_work(conn, change.source_record_id)
-        if work_id is not None:
-            self.rebuild(conn, work_id)
+        assignment = self.ensure_work(conn, change.source_record_id)
+        if assignment.work_id is None:
+            return
+        result = self.rebuild(conn, assignment.work_id)
+        if self.on_change is not None:
+            attached_to_existing = assignment.newly_attached and not assignment.new_work
+            self.on_change(conn, change, assignment.work_id, attached_to_existing, result)
