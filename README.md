@@ -12,4 +12,26 @@ task, evidence, and blockers.
 - Decisions and deviations: [`docs/decisions.md`](docs/decisions.md)
 - Verification log: [`docs/verification-report.md`](docs/verification-report.md)
 
-Setup instructions will be added with task T01 (packaging and local infrastructure).
+## Local setup
+
+Requirements: [uv](https://docs.astral.sh/uv/) (Python 3.12 is installed by uv from
+`.python-version`), Docker with Compose, and Node 22 for the web app.
+
+```bash
+cp .env.example .env
+```
+
+```bash
+make setup
+```
+
+```bash
+make db-up
+```
+
+```bash
+uv run proof-index doctor --check-db
+```
+
+`make test` runs the unit tests. Database tests and the remaining commands are added
+as their tasks land; see the status file.

@@ -1,6 +1,6 @@
 # Implementation status
-Current task: T01
-Last completed task: T00
+Current task: T02
+Last completed task: T01
 Confirmed decisions: broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
 
 Nothing in this repository is a completed production project yet. No backfill has
@@ -9,7 +9,7 @@ run, no live provider data has been ingested, and no evaluation has been perform
 | Task | State | Evidence | Remaining |
 |---|---|---|---|
 | T00 | done | Empty repo inspected (nothing to preserve); spec copied to `docs/spec/`; runtimes recorded in `docs/decisions.md` D002 and `docs/verification-report.md` T00 | — |
-| T01 | not_started | — | Packaging, CLI, settings, Compose, Makefile |
+| T01 | done | `uv.lock` committed; `proof-index --help`/`doctor --check-db` against PostgreSQL 17.11; 20 unit tests; import makes no network calls (verification report T01) | Make targets for later commands are added with their tasks |
 | T02 | not_started | — | — |
 | T03 | not_started | — | — |
 | T04 | not_started | — | — |
@@ -41,8 +41,8 @@ run, no live provider data has been ingested, and no evaluation has been perform
 - PostgreSQL 17.11 (`postgres:17` Docker image); Docker 29.9.2 with Compose v5.6.1
 
 ## Next actions
-1. T01: write `pyproject.toml`, resolve and commit `uv.lock`, add `proof-index` Typer CLI with `doctor`, settings module, `compose.yaml`, `.env.example`, Makefile.
-2. T01 gate: `proof-index --help`, `proof-index doctor`, local PostgreSQL connectivity through Compose, import without network calls.
+1. T02: Pydantic models (PartialDate, Author, SourceLink, NormalizedRecord, Tombstone), normalization helpers, taxonomy config.
+2. T02 gate: unit tests for date boundaries, old arXiv IDs, missing fields, safe links.
 
 ## External blockers
 - **Provider network access (this sandbox).** The environment's egress policy denies `eprint.iacr.org`, `oaipmh.arxiv.org`, `export.arxiv.org`, `dblp.org`, and `api.crossref.org` (proxy CONNECT 403, observed 2026-11-03). Live verification (T05), the real end-to-end sample (T16), and historical import (T17) cannot run here until those hosts are allowed in the environment's Network access settings, or the jobs run elsewhere (e.g. GitHub Actions). Independent work still possible: all parser, runner, database, classification, export, and UI work using synthetic and clearly labeled fixtures.

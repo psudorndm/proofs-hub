@@ -47,3 +47,23 @@ https://api.crossref.org/works?rows=1                          -> proxy CONNECT 
 Interpretation: the 403s come from this sandbox's egress policy, not from the
 providers. They say nothing about whether the providers would accept our requests.
 No live provider response has been observed in this environment.
+
+## T01 — Packaging and local infrastructure (2026-11-03)
+
+```text
+$ uv lock                      -> Resolved 48 packages (exclude-newer 2026-10-20T00:00:00Z)
+$ uv sync --locked             -> ok; pydantic 2.14.1, sqlalchemy 2.0.55, psycopg 3.3.6,
+                                  alembic 1.20.0, httpx 0.28.1, lxml 6.1.3, typer 0.27.3,
+                                  boto3 1.43.115, pytest 9.1.1, ruff 0.17.1, mypy 2.4.0
+$ uv run pytest -q             -> 20 passed
+$ uv run ruff check / format --check / mypy (strict) -> clean
+$ make db-up                   -> Container proofs-hub-postgres-1 Healthy
+$ uv run proof-index doctor --check-db
+    database_url postgresql+psycopg://proofs:***@127.0.0.1:5432/proofs
+    check database: ok (17.11 (Debian 17.11-1.pgdg13+2))   exit 0
+$ uv run proof-index --help    -> lists `doctor`
+```
+
+`test_package_import_makes_no_network_calls` imports the package in a fresh
+interpreter with socket creation disabled. `test_doctor_database_failure_exit_code_and_no_password`
+confirms exit code 6 and that the password never appears in output.
