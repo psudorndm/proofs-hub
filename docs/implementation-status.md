@@ -1,6 +1,6 @@
 # Implementation status
-Current task: T06
-Last completed task: T05
+Current task: T07
+Last completed task: T06
 Confirmed decisions: broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
 
 Nothing in this repository is a completed production project yet. No backfill has
@@ -14,7 +14,7 @@ run, no live provider data has been ingested, and no evaluation has been perform
 | T03 | done | `db/tables.py`, migration `0001`, `db/repository.py`, disposable-DB fixtures; 12 PostgreSQL integration tests (verification report T03) | — |
 | T04 | done | `storage/{base,local,s3,factory}.py`, `http/{client,rate_limit,errors}.py`, `db/locks.py`; 146 tests (verification report T04) | S3 backend tested only with botocore Stubber; no real bucket |
 | T05 | partial | Adapters `eprint`, `arxiv_oai`, `arxiv_atom`; OAI protocol layer; `config/sources.yaml`; `sources verify --bounded` (ran: proxy 403, reports written); `docs/source-contracts.md`; 21 parser tests + verify test on synthetic fixtures | **Live verification blocked**: all mappings are assumptions; ePrint date/version semantics and arXiv set list unresolved |
-| T06 | not_started | — | — |
+| T06 | done | `ingest/{runner,staging,promote,reconcile,hooks,service}.py`, `sync`/`backfill` CLI, migration 0002; 19 PostgreSQL recovery tests (verification report T06) | Classification/identity/event hooks are wired in T07–T09 |
 | T07 | not_started | — | — |
 | T08 | not_started | — | — |
 | T09 | not_started | — | — |
@@ -33,7 +33,7 @@ run, no live provider data has been ingested, and no evaluation has been perform
 ## Current interfaces
 - Public schema version: 1 (not yet implemented)
 - Rules version: rules-v1 (not yet implemented)
-- Database migration head: 0001
+- Database migration head: 0002
 
 ## Runtime baseline (tested)
 - CPython 3.12.13 via uv 0.11.32
@@ -41,8 +41,8 @@ run, no live provider data has been ingested, and no evaluation has been perform
 - PostgreSQL 17.11 (`postgres:17` Docker image); Docker 29.9.2 with Compose v5.6.1
 
 ## Next actions
-1. T06: harvest runner — run/page staging with durable cursors, blob storage of raw pages, promotion batches with observation keys and current selection, watermark transitions, pause/resume, token-expiry replay, pending-promotion export guard.
-2. T06 gate: injected interruption/replay/token-expiry tests on PostgreSQL; incomplete runs cannot publish.
+1. T07: `config/relevance-rules.yaml` (rules-v1), rule loader/compiler, evidence-group decision engine, per-source classification rows via a promotion hook, `classify --changed/--all`.
+2. T07 gate: F01/F04/F05 included; F06/F07 excluded; F08 review; F15 not auto-included; missing abstract not auto-excluded.
 3. When provider access exists: `sources verify --source eprint --bounded --capture-fixtures tests/fixtures/eprint` then reconcile `docs/source-contracts.md`.
 
 ## External blockers

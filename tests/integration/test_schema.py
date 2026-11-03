@@ -145,7 +145,7 @@ def test_migrate_empty_database_and_round_trip(empty_db_url: str) -> None:
     eng = make_engine(empty_db_url)
     try:
         with eng.connect() as conn:
-            assert current_revision(conn) == "0001"
+            assert current_revision(conn) == "0002"
             names = set(inspect(conn).get_table_names())
         expected = {table.name for table in t.metadata.sorted_tables}
         assert expected <= names
@@ -154,7 +154,7 @@ def test_migrate_empty_database_and_round_trip(empty_db_url: str) -> None:
             assert set(inspect(conn).get_table_names()) <= {"alembic_version"}
         migrate(empty_db_url)
         with eng.connect() as conn:
-            assert current_revision(conn) == "0001"
+            assert current_revision(conn) == "0002"
     finally:
         eng.dispose()
 

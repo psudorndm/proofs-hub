@@ -111,3 +111,33 @@ stored as if a provider had supplied them. No PDF URL is constructed from an ID.
 `httpx.ProxyError` (e.g. an egress policy answering CONNECT with 403) fails
 immediately as `TransportFailure`, like a provider 403. Retrying a policy denial
 only adds load and delay.
+
+## D010 — Runner recovery choices (T06)
+
+- **Network failures pause, protocol failures fail.** After the HTTP client's
+  retries, `TransportFailure` and retryable statuses (429/5xx) put the run in
+  `paused` (phase `fetching`) with the error recorded and exit code 3, so durable
+  pages are kept and the next invocation resumes. Protocol errors, page-structure
+  errors, non-retryable 4xx, cursor loops, and count mismatches mark the run
+  `failed`. The spec's state machine lists `paused` for budget stops; using it for
+  transient network loss is a deliberate extension.
+- **Expired cursor replay** increments `harvest_runs.cursor_epoch` and restarts the
+  run's fixed window; staging is idempotent (UNIQUE run/source/id/hash), and
+  completeness checks use only the final epoch. At most 3 replays.
+- **Totals** are validated per partition (all OAI pages, or one Atom query): all
+  reported totals in a partition must agree and equal parsed + quarantined +
+  locally filtered items. `strict_totals` can be disabled per runner if a live
+  provider proves to report estimates; that change must be recorded here.
+- **Watermark** on success is the first page's provider `responseDate` (falling
+  back to run start), never later than the window's start of observation, and is
+  never moved backwards. A bootstrap run first fixes its paired incremental
+  stream's starting boundary if unset, and never rewinds an existing one.
+- **Current selection across representations.** Ordering compares modification
+  time, then version number, then harvest datestamp, whichever both sides have.
+  With nothing comparable, the same adapter falls back to fetch order; different
+  adapters (arXiv Atom vs OAI) are treated as *equal*, so a differing hash becomes
+  a `conflict` observation instead of flip-flopping the current record.
+- **Identical content short-circuits.** An incoming row whose content hash equals
+  the current observation's reuses it (no new observation), so bookkeeping-only
+  re-exports do not grow history.
+- **Lock order** is provider lock, then catalog-writer lock (promotion only).

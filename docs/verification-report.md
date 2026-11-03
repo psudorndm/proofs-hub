@@ -145,3 +145,28 @@ arXiv IDs (`cs/0101001`), explicit ePrint references, Atom error entries, Atom
 result-ceiling failure, startIndex mismatch. `test_verify.py` exercises the
 verification success path through a mock transport and found a real set-spec
 matching bug (`cs:cs:CR` uses colons), now fixed.
+
+## T06 — Resumable ingestion runner (2026-11-03)
+
+```text
+$ make test-db                 -> 188 passed (19 runner tests on PostgreSQL 17)
+$ uv run ruff check; uv run mypy (47 files) -> clean
+$ make migrate                 -> head 0002
+$ uv run proof-index sync --source eprint
+    {"complete": false, "streams": [{"state": "paused", "error_code": "transport_failure",
+     "exit_code": 3, "pages_fetched": 0, ...}]}   exit 3   (sandbox proxy refused the host)
+```
+
+Runner tests (real transactions, injected crashes): full bootstrap run with
+watermark/coverage/incremental-boundary capture; `test_oai_no_records_match_is_successful_empty_window`;
+`test_oai_protocol_error_does_not_advance_watermark`; HTML-with-200 fails;
+`test_repeated_resumption_token_fails_completeness_check`; count mismatch fails;
+`test_expired_token_replays_window_without_duplicate_works`;
+`test_partial_page_write_resumes_from_last_durable_cursor` (resumes at the token, not
+the start); `test_partial_promotion_blocks_export_until_repaired`; budget pause exits
+0 with `complete:false` and resumes; 503 pauses with exit 3; lock held → exit 5;
+changed stream config refuses reuse; incremental `from` = watermark − 2 days;
+`test_rerun_of_identical_fixture_does_not_create_new_observations`;
+`test_older_backfill_cannot_replace_newer_current_observation`; equal ordering +
+different content → `conflict`; `test_undated_A_B_A_reversion_is_retained_once`;
+newer version replaces current.

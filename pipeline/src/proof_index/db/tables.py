@@ -113,6 +113,8 @@ harvest_runs = Table(
     Column("reconciled_at", TS, nullable=True),
     Column("records_quarantined", Integer, nullable=False, server_default=text("0")),
     Column("reported_total", BigInteger, nullable=True),
+    # Incremented when an expired cursor forces a replay of the run's fixed window.
+    Column("cursor_epoch", Integer, nullable=False, server_default=text("0")),
     CheckConstraint(_in("mode", RUN_MODES), name="mode"),
     CheckConstraint(_in("state", RUN_STATES), name="state"),
     CheckConstraint(
@@ -139,6 +141,9 @@ harvest_pages = Table(
     Column("quarantined_count", Integer, nullable=False, server_default=text("0")),
     Column("reported_total", BigInteger, nullable=True),
     Column("fetched_at", TS, nullable=False),
+    Column("epoch", Integer, nullable=False, server_default=text("0")),
+    Column("filtered_count", Integer, nullable=False, server_default=text("0")),
+    Column("provider_response_at", TS, nullable=True),
     UniqueConstraint("run_id", "ordinal"),
     CheckConstraint(_in("state", PAGE_STATES), name="state"),
     CheckConstraint("ordinal >= 0", name="ordinal"),
@@ -209,6 +214,8 @@ source_observations = Table(
     Column("item_kind", Text, nullable=False, server_default=text("'record'")),
     Column("parser_version", Text, nullable=False),
     Column("previous_observation_id", UUID(as_uuid=True), nullable=True),
+    # Adapter that produced this representation (e.g. arxiv_oai vs arxiv_atom).
+    Column("adapter", Text, nullable=False, server_default=text("'unknown'")),
     UniqueConstraint("source_record_id", "id"),
     CheckConstraint(_in("change_kind", CHANGE_KINDS), name="change_kind"),
     CheckConstraint(_in("item_kind", ITEM_KINDS), name="item_kind"),

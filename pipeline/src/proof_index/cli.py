@@ -180,6 +180,77 @@ def sources_verify(
         raise ProviderError(f"verification of {source} did not fully succeed; see report")
 
 
+def _run_streams(
+    source: str,
+    kinds: tuple[str, ...],
+    stream: str | None,
+    mode: str,
+    max_minutes: float | None,
+    resume: bool | None,
+) -> None:
+    from proof_index.http.rate_limit import Budget
+    from proof_index.ingest.service import (
+        Pipeline,
+        has_resumable_run,
+        overall_exit,
+        select_streams,
+    )
+
+    pipeline = Pipeline.from_settings(load_settings())
+    keys = select_streams(pipeline.config, source, kinds, stream)
+    if resume is False:
+        busy = [k for k in keys if has_resumable_run(pipeline.engine, k)]
+        if busy:
+            from proof_index.errors import InputError
+
+            raise InputError(f"unfinished runs exist for {', '.join(busy)}; pass --resume")
+    budget = Budget(max_minutes * 60 if max_minutes else None)
+    runner = pipeline.runner()
+    summaries = []
+    for key in keys:
+        summary = runner.run_stream(key, mode, budget)
+        summaries.append(summary)
+        if summary.exit_code == 5:
+            break
+    emit(
+        {
+            "command": mode,
+            "source": source,
+            "complete": all(s.complete for s in summaries),
+            "streams": [s.to_json() for s in summaries],
+        },
+        True,
+    )
+    code = overall_exit(summaries)
+    if code:
+        raise typer.Exit(code=code)
+
+
+@app.command()
+@handle_errors
+def sync(
+    source: str = typer.Option(..., "--source"),
+    stream: str | None = typer.Option(None, "--stream", help="Only this configured stream."),
+    max_minutes: float | None = typer.Option(None, "--max-minutes"),
+) -> None:
+    """Daily incremental/supplemental sync for one source (resumes unfinished runs)."""
+    _run_streams(source, ("incremental", "supplemental"), stream, "sync", max_minutes, None)
+
+
+@app.command()
+@handle_errors
+def backfill(
+    source: str = typer.Option(..., "--source"),
+    stream: str | None = typer.Option(None, "--stream"),
+    resume: bool = typer.Option(False, "--resume", help="Continue an unfinished run."),
+    max_minutes: float = typer.Option(
+        45, "--max-minutes", help="Execution bound for this slice; never a coverage cutoff."
+    ),
+) -> None:
+    """Resumable historical import. A bounded slice exits 0 with complete:false."""
+    _run_streams(source, ("bootstrap", "supplemental"), stream, "backfill", max_minutes, resume)
+
+
 @app.callback()
 def _root(
     version: bool = typer.Option(False, "--version", help="Print the version and exit."),
