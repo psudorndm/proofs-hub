@@ -1,0 +1,50 @@
+# Implementation status
+Current task: T01
+Last completed task: T00
+Confirmed decisions: broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
+
+Nothing in this repository is a completed production project yet. No backfill has
+run, no live provider data has been ingested, and no evaluation has been performed.
+
+| Task | State | Evidence | Remaining |
+|---|---|---|---|
+| T00 | done | Empty repo inspected (nothing to preserve); spec copied to `docs/spec/`; runtimes recorded in `docs/decisions.md` D002 and `docs/verification-report.md` T00 | — |
+| T01 | not_started | — | Packaging, CLI, settings, Compose, Makefile |
+| T02 | not_started | — | — |
+| T03 | not_started | — | — |
+| T04 | not_started | — | — |
+| T05 | not_started | — | Live verification blocked (see External blockers) |
+| T06 | not_started | — | — |
+| T07 | not_started | — | — |
+| T08 | not_started | — | — |
+| T09 | not_started | — | — |
+| T10 | not_started | — | — |
+| T11 | not_started | — | — |
+| T12 | not_started | — | — |
+| T13 | not_started | — | — |
+| T14 | not_started | — | — |
+| T15 | not_started | — | — |
+| T16 | not_started | — | Needs provider network access |
+| T17 | not_started | — | Needs provider network access and durable compute |
+| T18 | not_started | — | Needs real records; independent human labels absent |
+| T19 | not_started | — | — |
+| T20 | not_started | — | Needs deployment authorization |
+
+## Current interfaces
+- Public schema version: 1 (not yet implemented)
+- Rules version: rules-v1 (not yet implemented)
+- Database migration head: none yet
+
+## Runtime baseline (tested)
+- CPython 3.12.13 via uv 0.11.32
+- Node v22.23.4, npm 10.9.9
+- PostgreSQL 17.11 (`postgres:17` Docker image); Docker 29.9.2 with Compose v5.6.1
+
+## Next actions
+1. T01: write `pyproject.toml`, resolve and commit `uv.lock`, add `proof-index` Typer CLI with `doctor`, settings module, `compose.yaml`, `.env.example`, Makefile.
+2. T01 gate: `proof-index --help`, `proof-index doctor`, local PostgreSQL connectivity through Compose, import without network calls.
+
+## External blockers
+- **Provider network access (this sandbox).** The environment's egress policy denies `eprint.iacr.org`, `oaipmh.arxiv.org`, `export.arxiv.org`, `dblp.org`, and `api.crossref.org` (proxy CONNECT 403, observed 2026-11-03). Live verification (T05), the real end-to-end sample (T16), and historical import (T17) cannot run here until those hosts are allowed in the environment's Network access settings, or the jobs run elsewhere (e.g. GitHub Actions). Independent work still possible: all parser, runner, database, classification, export, and UI work using synthetic and clearly labeled fixtures.
+- **ePrint field semantics.** Spec section 23: ePrint original/update/version fields have never been verified against an accessible live response. Still unverified.
+- **Docker daemon.** Not running at session start; started manually (`dockerd`). Needs restarting in a new session.

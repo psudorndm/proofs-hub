@@ -1,0 +1,27 @@
+# Runtime and scratch data (blobs, releases, review exports, backups)
+/work/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Node / Astro
+node_modules/
+apps/web/dist/
+apps/web/.astro/
+
+# Local configuration
+.env
+.env.local
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
