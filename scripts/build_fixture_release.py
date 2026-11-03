@@ -42,6 +42,7 @@ def main() -> int:
     parser.add_argument(
         "--site-url", default=os.environ.get("PUBLIC_SITE_URL", "http://localhost:4321")
     )
+    parser.add_argument("--bulk", type=int, default=0, help="Add N generated synthetic records.")
     args = parser.parse_args()
     admin_url = os.environ.get("FIXTURE_DATABASE_ADMIN_URL") or os.environ.get(
         "TEST_DATABASE_ADMIN_URL"
@@ -70,6 +71,7 @@ def main() -> int:
             rules_path=ROOT / "config/relevance-rules.yaml",
             venues_path=ROOT / "config/venues.yaml",
             work_dir=work,
+            bulk=args.bulk,
         )
         exported = export_release(
             engine,

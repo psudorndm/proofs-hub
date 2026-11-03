@@ -305,3 +305,32 @@ detail page were reviewed: preview label, freshness and coverage notes, area tab
 view tabs, card badges, withdrawn-source note, sources table, inclusion evidence,
 and history render as specified. Keyboard-only and screen-reader checks are not yet
 done (T19).
+
+## T13 — Search index and controller (2026-11-03)
+
+```text
+$ cd apps/web && npm test                     -> 47 passed (adds URL state, filter translation,
+                                                 identifier parsing, hydration, release mismatch,
+                                                 late-response guard, DOM renderer safety)
+$ npm run check                               -> 0 errors
+$ make test-db                                -> 278 passed
+$ make web-browser-check                      -> fixture-search (49 papers, 40 generated synthetic
+                                                 fillers); 90 pages; build-search indexed 49
+                                                 canonical paper pages; 22/22 browser checks passed
+```
+
+The browser checks run real Pagefind searches in Chromium against `astro preview` of
+the production build (clock pinned to 2026-11-03): multi-page results and Next/Back
+with URL state (`test_url_state_round_trip_and_browser_back`); source OR returning the
+two-source work once; area OR returning the two-area work once; cross-facet AND;
+area tab reflects URL; explicit unknown-date selection; day-precision-only rolling
+window; `test_unknown_dates_sort_last` for newest and oldest; exact identifier search
+and unknown identifier; reversed range rejected inline; constrained empty date set
+returns zero; static vs client-rendered card parity on the same work;
+`test_release_mismatch_requests_reload_not_silent_merge` (intercepted payload);
+index-failure message; no overflow at 390 px; no JavaScript errors.
+Unit tests cover `test_facet_OR_with_cross_facet_AND`,
+`test_constrained_empty_date_token_set_returns_zero`,
+`test_partial_date_range_uses_documented_overlap_semantics`,
+`test_search_hydrates_only_requested_page` (25 of 60 hydrated, cache reused), and
+`test_late_search_response_cannot_replace_current_results`.

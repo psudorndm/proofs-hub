@@ -1,6 +1,6 @@
 """Validate a release directory (wrapper around ``proof-index release validate``).
 
-    uv run python scripts/validate-release.py work/releases/<id> [--require-live]
+uv run python scripts/validate-release.py work/releases/<id> [--require-live]
 """
 
 from __future__ import annotations

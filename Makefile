@@ -1,5 +1,5 @@
 # Thin wrappers around documented commands. Each target runs a real command.
-.PHONY: setup db-up db-down doctor migrate test test-db fixture-export schema web-build web-preview web-test lint typecheck check
+.PHONY: setup db-up db-down doctor migrate test test-db fixture-export schema web-build web-preview web-test web-browser-check lint typecheck check
 
 UV ?= uv
 COMPOSE ?= docker compose
@@ -46,6 +46,15 @@ web-preview: web-build
 
 web-test:
 	cd apps/web && CATALOG_DIR=$(abspath $(CATALOG_DIR)) npm run check && CATALOG_DIR=$(abspath $(CATALOG_DIR)) npm test
+
+# Real-index browser checks (Playwright Chromium) against a release with >25 papers.
+SEARCH_RELEASE ?= work/releases/fixture-search
+web-browser-check:
+	rm -rf $(SEARCH_RELEASE)
+	TEST_DATABASE_ADMIN_URL=$(TEST_DATABASE_ADMIN_URL) $(UV) run python scripts/build_fixture_release.py --out $(SEARCH_RELEASE) --bulk 40
+	cd apps/web && CATALOG_DIR=$(abspath $(SEARCH_RELEASE)) npm run build
+	cd apps/web && (npx astro preview --port 4321 --host 127.0.0.1 &) && sleep 5 && \
+	  node tests/browser/search-checks.mjs http://127.0.0.1:4321/; status=$$?; npx astro preview stop; exit $$status
 
 lint:
 	$(UV) run ruff check pipeline tests scripts db

@@ -74,3 +74,24 @@ export function coverage(): any {
 export function status(): any {
   return readJson("status.json");
 }
+
+export interface SearchData {
+  rank_newest: number;
+  rank_oldest: number;
+  rank_updated: number;
+  publication_period: string;
+  update_period: string;
+  has_update: "yes" | "no";
+  identifiers: string[];
+  venues: string[];
+  code: "yes" | "no";
+  foundational: "yes" | "no";
+}
+
+let searchIndex: Record<string, SearchData> | undefined;
+export function searchData(id: string): SearchData {
+  searchIndex ??= (readJson("search-index-data.json") as { papers: Record<string, SearchData> }).papers;
+  const found = searchIndex[id];
+  if (!found) throw new Error(`no search data for paper ${id}`);
+  return found;
+}

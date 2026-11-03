@@ -4,8 +4,22 @@ import { ABSTRACT_UNAVAILABLE, labelFor, sourceLabel, AREA_CLASS } from "../lib/
 import { formatPublished } from "../lib/dates";
 import { withBase } from "../lib/urls";
 import CitationButton from "./CitationButton.astro";
-interface Props { paper: PublicPaper; taxonomy: Taxonomy; related: { id: string; title: string; path: string }[] }
-const { paper, taxonomy, related } = Astro.props;
+import type { SearchData } from "../lib/catalog";
+interface Props { paper: PublicPaper; taxonomy: Taxonomy; related: { id: string; title: string; path: string }[]; search: SearchData; jsonPath: string }
+const { paper, taxonomy, related, search, jsonPath } = Astro.props;
+const pad = (n: number) => String(n).padStart(8, "0");
+const filters: [string, string][] = [
+  ...paper.areas.map((a) => ["area", a] as [string, string]),
+  ...paper.topics.map((t) => ["topic", t] as [string, string]),
+  ...[...new Set(paper.sources.map((s) => s.provider))].map((s) => ["source", s] as [string, string]),
+  ...search.venues.map((v) => ["venue", v] as [string, string]),
+  ...paper.contributions.map((c) => ["kind", c] as [string, string]),
+  ["code", search.code], ["status", paper.status], ["foundational", search.foundational],
+  ["publication_period", search.publication_period], ["update_period", search.update_period],
+  ["has_update", search.has_update],
+  ...search.identifiers.map((i) => ["identifier", i] as [string, string]),
+];
+const venueNames = [...new Set(paper.publications.map((p) => p.venue_name).filter(Boolean))];
 const contributions = paper.contributions.map((c) => labelFor(taxonomy, "contributions", c));
 const REVIEW: Record<string, string> = {
   automatic: "Automatic (deterministic rules)",
@@ -17,9 +31,17 @@ const EVENT: Record<string, string> = {
   metadata_updated: "Metadata updated", withdrawn: "Withdrawn", restored: "Restored", curation: "Curation change",
 };
 ---
-<article class="detail" data-paper-id={paper.id}>
-  <h1 data-math>{paper.title}</h1>
-  <p class="paper-meta">{paper.authors.length ? paper.authors.map((a) => a.display_name).join(", ") : "Authors unavailable"}</p>
+<article class="detail" data-paper-id={paper.id} data-pagefind-body>
+  <h1 data-math data-pagefind-weight="3">{paper.title}</h1>
+  <p class="paper-meta" data-pagefind-weight="2">{paper.authors.length ? paper.authors.map((a) => a.display_name).join(", ") : "Authors unavailable"}</p>
+  <div hidden>
+    {filters.map(([key, value]) => <span data-pagefind-filter={`${key}[data-value]`} data-value={value}></span>)}
+    <span data-pagefind-sort="rank_newest[data-value]" data-value={pad(search.rank_newest)}></span>
+    <span data-pagefind-sort="rank_oldest[data-value]" data-value={pad(search.rank_oldest)}></span>
+    <span data-pagefind-sort="rank_updated[data-value]" data-value={pad(search.rank_updated)}></span>
+    <span data-pagefind-meta="id[data-value]" data-value={paper.id}></span>
+    <span data-pagefind-meta="json[data-value]" data-value={jsonPath}></span>
+  </div>
   <p class="paper-meta">{formatPublished(paper.published)}{paper.published.precision !== "day" && paper.published.precision !== "unknown" && <> (approximate: the sources give only a {paper.published.precision})</>}</p>
   <ul class="paper-tags">
     {paper.areas.map((a) => <li class={`badge ${AREA_CLASS[a]}`}>{labelFor(taxonomy, "areas", a)}</li>)}
@@ -29,12 +51,14 @@ const EVENT: Record<string, string> = {
     {paper.status !== "active" && <li class="badge badge-status">{paper.status === "withdrawn" ? "Withdrawn" : "Unavailable at all known sources"}</li>}
   </ul>
 
+  <p class="paper-note">Identifiers: <span class="mono">{search.identifiers.join(" · ")}</span>{venueNames.length > 0 && <> · Venue: {venueNames.join("; ")}</>}</p>
+
   <section aria-labelledby="abstract-h">
     <h2 id="abstract-h">Abstract</h2>
     <p data-math>{paper.abstract ?? ABSTRACT_UNAVAILABLE}</p>
   </section>
 
-  <section aria-labelledby="sources-h">
+  <section data-pagefind-ignore aria-labelledby="sources-h">
     <h2 id="sources-h">Sources</h2>
     <div class="table-wrap"><table>
       <thead><tr><th scope="col">Source</th><th scope="col">Identifier</th><th scope="col">Version</th><th scope="col">Status</th><th scope="col">Links</th></tr></thead>
@@ -56,7 +80,7 @@ const EVENT: Record<string, string> = {
   </section>
 
   {paper.publications.length > 0 && (
-    <section aria-labelledby="pub-h">
+    <section data-pagefind-ignore aria-labelledby="pub-h">
       <h2 id="pub-h">Publication records</h2>
       <p class="paper-note">Listed from bibliographic metadata; a listing is not by itself evidence of peer review.</p>
       <ul>
@@ -68,7 +92,7 @@ const EVENT: Record<string, string> = {
   )}
 
   {paper.code_links.length > 0 && (
-    <section aria-labelledby="code-h">
+    <section data-pagefind-ignore aria-labelledby="code-h">
       <h2 id="code-h">Code</h2>
       <ul>
         {paper.code_links.map((c) => (
@@ -78,12 +102,12 @@ const EVENT: Record<string, string> = {
     </section>
   )}
 
-  <section aria-labelledby="cite-h">
+  <section data-pagefind-ignore aria-labelledby="cite-h">
     <h2 id="cite-h">Cite</h2>
     <CitationButton bibtexPath={paper.bibtex_path} />
   </section>
 
-  <section aria-labelledby="incl-h">
+  <section data-pagefind-ignore aria-labelledby="incl-h">
     <h2 id="incl-h">Why this paper is included</h2>
     <p>{paper.inclusion.explanation}</p>
     <p class="paper-note">Decision type: {REVIEW[paper.inclusion.review_status]}</p>
@@ -98,13 +122,13 @@ const EVENT: Record<string, string> = {
   </section>
 
   {related.length > 0 && (
-    <section aria-labelledby="rel-h">
+    <section data-pagefind-ignore aria-labelledby="rel-h">
       <h2 id="rel-h">Related works</h2>
       <ul>{related.map((r) => <li><a href={r.path}>{r.title}</a></li>)}</ul>
     </section>
   )}
 
-  <section aria-labelledby="hist-h">
+  <section data-pagefind-ignore aria-labelledby="hist-h">
     <h2 id="hist-h">History</h2>
     <ol>
       {paper.history.map((h) => (

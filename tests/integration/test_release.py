@@ -129,7 +129,7 @@ def test_list_semantics(release: tuple[Path, FixedClock]) -> None:
 def test_ranks_are_unique_and_unknown_dates_sort_last(release: tuple[Path, FixedClock]) -> None:
     root, _ = release
     facets = load(root, "search-facets.json")
-    papers = facets["papers"]
+    papers = load(root, "search-index-data.json")["papers"]
     for key in ("rank_newest", "rank_oldest", "rank_updated"):
         assert sorted(p[key] for p in papers.values()) == list(range(1, len(papers) + 1))
     unknown = next(i for i, p in papers.items() if p["publication_period"] == "unknown")

@@ -1,7 +1,8 @@
 ---
 import Base from "../../../layouts/Base.astro";
 import PaperDetail from "../../../components/PaperDetail.astro";
-import { aliases, paper, paperIds, taxonomy } from "../../../lib/catalog";
+import { aliases, manifest, paper, paperIds, searchData, taxonomy } from "../../../lib/catalog";
+import { releaseAsset } from "../../../lib/urls";
 import { withBase } from "../../../lib/urls";
 export function getStaticPaths() {
   const live = paperIds().map((id) => ({ params: { id }, props: { id, movedTo: null as string | null } }));
@@ -25,6 +26,7 @@ const related = current.related_work_ids.map((rid) => {
   <Base title={current.title} canonicalPath={current.canonical_path}
     description={current.abstract ? current.abstract.slice(0, 200) : undefined}>
     <p class="paper-note"><a href={withBase("")}>Back to the index</a></p>
-    <PaperDetail paper={current} taxonomy={taxonomy()} related={related} />
+    <PaperDetail paper={current} taxonomy={taxonomy()} related={related} search={searchData(current.id)}
+      jsonPath={releaseAsset(manifest().release_id, `papers/${current.id}.json`)} />
   </Base>
 )}

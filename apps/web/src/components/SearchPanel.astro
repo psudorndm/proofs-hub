@@ -23,7 +23,7 @@ const sources = Object.keys(m.source_record_counts).sort();
     </div>
     <ul class="tabs" aria-label="Area">
       {areaTabs.map((t) => (
-        <li><a href={t.id ? `${withBase("search/")}?area=${t.id}` : withBase("search/")} aria-current={area === t.id && view === "search" ? "true" : undefined} data-area={t.id ?? ""}>{t.label}</a></li>
+        <li><a href={t.id ? `${withBase("search/")}?area=${t.id}` : withBase("search/")} aria-current={view === "search" && t.id === null ? "true" : undefined} data-area={t.id ?? ""}>{t.label}</a></li>
       ))}
     </ul>
     <ul class="tabs" aria-label="View">

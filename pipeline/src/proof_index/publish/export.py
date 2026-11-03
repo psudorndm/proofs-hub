@@ -705,9 +705,10 @@ def _write_facets(
                 for k in sorted(update_tokens)
             ],
             "values": {k: sorted(v) for k, v in values.items()},
-            "papers": per_paper,
         },
     )
+    # Per-paper attributes for the search indexer (not downloaded by browsers).
+    _dump(root / "search-index-data.json", {"release_id": release_id, "papers": per_paper})
 
 
 def _iter_files(root: Path) -> Iterable[Path]:

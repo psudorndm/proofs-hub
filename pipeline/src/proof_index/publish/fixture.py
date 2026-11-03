@@ -41,6 +41,29 @@ FIRST = ["F01", "F02", "F04", "F05", "F06", "F07", "F08", "F10", "F11", "F12", "
 SECOND = ["F03", "F16"]
 
 
+def _bulk_record(i: int) -> dict[str, Any]:
+    """Generated SYNTHETIC filler records (for pagination tests only)."""
+    return {
+        "source": "eprint",
+        "source_id": f"2025/{1000 + i}",
+        "title": f"Synthetic zero-knowledge proof record number {i}",
+        "authors": [{"display_name": f"Synthetic Author {i % 7}"}],
+        "abstract": "Generated filler record for pagination tests; not a real paper.",
+        "published": {"year": 2025, "month": 1 + i % 12, "day": 1 + i % 28, "precision": "day"},
+        "source_modified_at": None,
+        "harvest_datestamp": None,
+        "source_version": None,
+        "doi": None,
+        "identifiers": {},
+        "source_categories": [],
+        "venue_key": None,
+        "venue_name": None,
+        "links": [],
+        "status": "active",
+        "evidence": {"synthetic": "generated bulk fixture"},
+    }
+
+
 def _no_http(provider: str, budget: Budget) -> Any:
     raise ProviderError("the fixture builder never uses the network")
 
@@ -56,6 +79,7 @@ def build_fixture_catalog(
     rules_path: Path,
     venues_path: Path,
     work_dir: Path,
+    bulk: int = 0,
 ) -> dict[str, Any]:
     cases = {c["case"]: c["record"] for c in json.loads(cases_path.read_text())["cases"]}
     rules = load_rules(rules_path, taxonomy)
@@ -73,6 +97,8 @@ def build_fixture_catalog(
     f17["abstract"] = cases["F13"]["abstract"] + " (Synthetic correction.)"
     f17["source_modified_at"] = "2026-11-01T00:00:00Z"
     batches = [[cases[c] for c in FIRST], [cases[c] for c in SECOND] + [f17]]
+    if bulk:
+        batches.append([_bulk_record(i) for i in range(1, bulk + 1)])
     summaries = []
     body = cases_path.read_bytes()
     digest = sha256_hex(body)

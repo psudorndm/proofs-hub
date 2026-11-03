@@ -251,3 +251,24 @@ only adds load and delay.
   and copies release assets to `assets/releases/<release-id>/` (plus up to two
   previous releases via `PREVIOUS_CATALOG_DIRS`).
 - Astro 7's `astro preview` runs a managed background server (`astro preview stop`).
+
+## D016 — Search implementation details (T13)
+
+- **Pagefind semantics were verified empirically on the installed 1.5.2 build**
+  (probe index + Chromium): attribute-sourced filters (`area[data-value]`) accept
+  values containing colons; `{any: [...]}` is OR and a plain array is AND; facets
+  combine with AND; `data-pagefind-ignore` sections are not indexed; and an empty
+  `{any: []}` matches **every** record — so the adapter returns zero locally for a
+  constrained-but-empty date set and never sends it.
+- The index is built with the Node API (`addHTMLFile`) from only the generated
+  canonical paper pages, using each paper's `canonical_path` as URL, and written to
+  `assets/releases/<release-id>/pagefind/` so pages and index always come from the
+  same export. The build fails if any page is missing, unindexed, or lacks its ID.
+- Sort ranks are zero-padded to 8 digits so string and numeric order agree.
+- Per-paper search attributes moved from `search-facets.json` to an indexer-only
+  `search-index-data.json`; browsers download only the token/value file.
+- `window=unknown` is the explicit "Unknown date" selection (spec 12). Without a
+  date constraint, unknown dates are included; any date constraint excludes them.
+- Old-style arXiv IDs (`hep-th/9901001`) are treated as identifier queries only with
+  an explicit `arXiv:` prefix or arXiv URL, so ordinary `word/word` text is never
+  misread as an identifier. Bare `YYYY/NNNN` is treated as an ePrint ID.
