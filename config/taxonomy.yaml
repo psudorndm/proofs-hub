@@ -1,0 +1,86 @@
+# Shared vocabulary (spec section 17). IDs are stable; display names may change.
+# Adding or removing an ID requires bumping `version`.
+version: taxonomy-v1
+
+areas:
+  - id: proof-systems
+    display_name: Proof systems
+  - id: security-proofs
+    display_name: Security proofs
+  - id: formal-verification
+    display_name: Formal verification
+
+topics:
+  - id: zero-knowledge
+    display_name: Zero knowledge and knowledge proofs
+    areas: [proof-systems]
+  - id: succinct-proofs
+    display_name: Succinct proofs and arguments
+    areas: [proof-systems]
+  - id: interactive-foundations
+    display_name: Interactive proofs, PCPs, and IOPs
+    areas: [proof-systems]
+  - id: commitments
+    display_name: Commitments and inner-product arguments
+    areas: [proof-systems]
+  - id: arithmetization
+    display_name: Arithmetization and lookups
+    areas: [proof-systems]
+  - id: recursion
+    display_name: Recursion, folding, and accumulation
+    areas: [proof-systems]
+  - id: alternative-constructions
+    display_name: MPC/VOLE-in-the-head and other constructions
+    areas: [proof-systems]
+  - id: proving-systems
+    display_name: zkVMs, compilers, and proving infrastructure
+    areas: [proof-systems]
+  - id: verifiable-computation
+    display_name: Verifiable computation and applications
+    areas: [proof-systems]
+  - id: security-definitions
+    display_name: Security definitions and models
+    areas: [security-proofs]
+  - id: security-reductions
+    display_name: Security proofs and reductions
+    areas: [security-proofs]
+  - id: composability
+    display_name: Composition and universal composability
+    areas: [security-proofs]
+  - id: protocol-analysis
+    display_name: Cryptographic protocol analysis
+    areas: [security-proofs]
+  - id: cryptanalysis
+    display_name: Attacks, counterexamples, and proof gaps
+    areas: [security-proofs]
+  - id: quantum-security
+    display_name: Quantum security analysis
+    areas: [security-proofs, proof-systems]
+  - id: formal-protocol-verification
+    display_name: Formal protocol verification
+    areas: [formal-verification]
+  - id: mechanized-proofs
+    display_name: Mechanized cryptographic proofs
+    areas: [formal-verification]
+  - id: verified-implementations
+    display_name: Verified cryptographic implementations
+    areas: [formal-verification]
+  - id: computational-soundness
+    display_name: Computational soundness
+    areas: [formal-verification, security-proofs]
+  - id: privacy-applications
+    display_name: Privacy and authentication applications
+    # Evidence-dependent: may appear under any area.
+    areas: [proof-systems, security-proofs, formal-verification]
+
+contributions:
+  - id: construction-theory
+    display_name: Construction / theory
+  - id: analysis-attack
+    display_name: Analysis / attack
+  - id: implementation-optimization
+    display_name: Implementation / optimization
+  - id: application
+    display_name: Application
+  - id: survey-tutorial
+    display_name: Survey / tutorial

@@ -67,3 +67,19 @@ $ uv run proof-index --help    -> lists `doctor`
 `test_package_import_makes_no_network_calls` imports the package in a fresh
 interpreter with socket creation disabled. `test_doctor_database_failure_exit_code_and_no_password`
 confirms exit code 6 and that the password never appears in output.
+
+## T02 — Shared schemas and pure normalization (2026-11-03)
+
+```text
+$ uv run pytest -q             -> 101 passed
+$ uv run ruff check; uv run mypy (strict, 16 files) -> clean
+```
+
+Covered: the full section 12 calendar table at 2026-11-03 (`test_spec_calendar_table`),
+`test_recent_window_uses_zero_through_six_days`, `test_future_date_does_not_enter_recent_results`,
+`test_year_only_date_is_not_fabricated_as_january_first`,
+`test_partial_date_range_uses_documented_overlap_semantics`,
+`test_old_arxiv_identifier_preserves_archive_prefix`, ePrint `2020/0007 -> 2020/7`, DOI
+prefix stripping, unsafe links (`javascript:`, embedded credentials, missing host),
+empty-title rejection, absent authors/abstract allowed, whitespace-invariant content
+hash, set-vs-ordered hash fields, and taxonomy closed-vocabulary validation.

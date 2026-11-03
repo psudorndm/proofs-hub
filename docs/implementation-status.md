@@ -1,6 +1,6 @@
 # Implementation status
-Current task: T02
-Last completed task: T01
+Current task: T03
+Last completed task: T02
 Confirmed decisions: broad scope (proof systems + security proofs + formal verification + protocol analysis); public, no reader accounts; full available history, no year cutoff; daily updates after historical import
 
 Nothing in this repository is a completed production project yet. No backfill has
@@ -10,7 +10,7 @@ run, no live provider data has been ingested, and no evaluation has been perform
 |---|---|---|---|
 | T00 | done | Empty repo inspected (nothing to preserve); spec copied to `docs/spec/`; runtimes recorded in `docs/decisions.md` D002 and `docs/verification-report.md` T00 | — |
 | T01 | done | `uv.lock` committed; `proof-index --help`/`doctor --check-db` against PostgreSQL 17.11; 20 unit tests; import makes no network calls (verification report T01) | Make targets for later commands are added with their tasks |
-| T02 | not_started | — | — |
+| T02 | done | `models/{dates,source,classification}.py`, `normalize/*`, `config/taxonomy.yaml`; 101 unit tests incl. spec calendar table (verification report T02) | Public model (`models/public.py`) lands with T11 |
 | T03 | not_started | — | — |
 | T04 | not_started | — | — |
 | T05 | not_started | — | Live verification blocked (see External blockers) |
@@ -41,8 +41,8 @@ run, no live provider data has been ingested, and no evaluation has been perform
 - PostgreSQL 17.11 (`postgres:17` Docker image); Docker 29.9.2 with Compose v5.6.1
 
 ## Next actions
-1. T02: Pydantic models (PartialDate, Author, SourceLink, NormalizedRecord, Tombstone), normalization helpers, taxonomy config.
-2. T02 gate: unit tests for date boundaries, old arXiv IDs, missing fields, safe links.
+1. T03: SQLAlchemy Core tables per section 6, Alembic migration, repository/transaction helpers, disposable test database fixture.
+2. T03 gate: migrate empty PostgreSQL; FK/uniqueness tests; clean rollback of failing transaction.
 
 ## External blockers
 - **Provider network access (this sandbox).** The environment's egress policy denies `eprint.iacr.org`, `oaipmh.arxiv.org`, `export.arxiv.org`, `dblp.org`, and `api.crossref.org` (proxy CONNECT 403, observed 2026-11-03). Live verification (T05), the real end-to-end sample (T16), and historical import (T17) cannot run here until those hosts are allowed in the environment's Network access settings, or the jobs run elsewhere (e.g. GitHub Actions). Independent work still possible: all parser, runner, database, classification, export, and UI work using synthetic and clearly labeled fixtures.

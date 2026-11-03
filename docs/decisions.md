@@ -41,3 +41,19 @@ The Docker CLI and Compose plugin are installed, but the daemon was not running.
 `dockerd` was started in the background for this session. This is a property of
 the sandbox, not of the project; developer machines and GitHub Actions run their
 own daemon/service containers.
+
+## D004 — Content hash excludes the OAI harvest datestamp (T02)
+
+Spec 5.4 includes "source-supplied dates" in the semantic hash but excludes
+bookkeeping. `harvest_datestamp` (the OAI header datestamp) changes whenever a
+provider re-exports a record, including for bookkeeping-only reasons, so it is
+excluded from `content_sha256` along with `evidence`. It still participates in
+the observation key and current-observation ordering (section 8).
+`source_modified_at`, `source_version`, `published`, and `status` are included.
+Links are hashed as a set sorted by (kind, url); authors keep their order.
+
+## D005 — DOIs are stored lower-cased (T02)
+
+DOIs are case-insensitive. `normalize_doi` strips URL/`doi:` prefixes and
+whitespace and lower-cases the result; the original provider string remains in
+the stored raw response.
