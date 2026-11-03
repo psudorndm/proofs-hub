@@ -1,0 +1,32 @@
+{
+  "accessed_at": "2026-11-03T20:58:53.232768+00:00",
+  "captured_by": "proof-index sources verify --bounded",
+  "content_type": "application/atom+xml; charset=utf-8",
+  "endpoint": "https://export.arxiv.org/api/query",
+  "http_status": 200,
+  "params": [
+    [
+      "search_query",
+      "cat:cs.IT AND (ti:\"zero knowledge\" OR abs:\"zero knowledge\" OR ti:\"zero-knowledge\" OR abs:\"zero-knowledge\" OR ti:SNARK OR abs:SNARK OR ti:STARK OR abs:STARK OR ti:\"succinct argument\" OR abs:\"succinct argument\" OR ti:\"interactive proof\" OR abs:\"interactive proof\" OR ti:\"probabilistically checkable proof\" OR abs:\"probabilistically checkable proof\" OR ti:\"interactive oracle proof\" OR abs:\"interactive oracle proof\" OR ti:\"polynomial commitment\" OR abs:\"polynomial commitment\" OR ti:\"proof of knowledge\" OR abs:\"proof of knowledge\" OR ti:\"verifiable computation\" OR abs:\"verifiable computation\" OR ti:\"security proof\" OR abs:\"security proof\" OR ti:\"provable security\" OR abs:\"provable security\" OR ti:\"universal composability\" OR abs:\"universal composability\" OR ti:\"random oracle model\" OR abs:\"random oracle model\" OR ti:\"formal verification cryptographic\" OR abs:\"formal verification cryptographic\" OR ti:\"protocol verification\" OR abs:\"protocol verification\" OR ti:\"Tamarin prover\" OR abs:\"Tamarin prover\" OR ti:ProVerif OR abs:ProVerif OR ti:EasyCrypt OR abs:EasyCrypt OR ti:CryptoVerif OR abs:CryptoVerif) AND lastUpdatedDate:[202611012058 TO 999912312359]"
+    ],
+    [
+      "start",
+      "0"
+    ],
+    [
+      "max_results",
+      "200"
+    ],
+    [
+      "sortBy",
+      "submittedDate"
+    ],
+    [
+      "sortOrder",
+      "ascending"
+    ]
+  ],
+  "provider": "arxiv",
+  "raw_sha256": "6dfe2d39918cdb786ce54bc6a8f3b693b46ecf2025fcf8cb41fcf760b5d4a9da",
+  "recorded_at": "2026-11-03T20:58:53.233498+00:00"
+}

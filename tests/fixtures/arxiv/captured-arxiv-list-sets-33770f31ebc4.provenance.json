@@ -1,0 +1,16 @@
+{
+  "accessed_at": "2026-11-03T20:58:43.329797+00:00",
+  "captured_by": "proof-index sources verify --bounded",
+  "content_type": "text/xml",
+  "endpoint": "https://oaipmh.arxiv.org/oai",
+  "http_status": 200,
+  "params": [
+    [
+      "verb",
+      "ListSets"
+    ]
+  ],
+  "provider": "arxiv",
+  "raw_sha256": "33770f31ebc4bdd2d453b4620774e0a976bc75eca9fcf6e8e9d77f9d3f903995",
+  "recorded_at": "2026-11-03T20:58:43.330270+00:00"
+}

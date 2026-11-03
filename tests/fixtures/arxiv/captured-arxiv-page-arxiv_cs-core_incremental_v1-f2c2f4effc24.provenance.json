@@ -1,0 +1,28 @@
+{
+  "accessed_at": "2026-11-03T20:58:52.538531+00:00",
+  "captured_by": "proof-index sources verify --bounded",
+  "content_type": "text/xml",
+  "endpoint": "https://oaipmh.arxiv.org/oai",
+  "http_status": 200,
+  "params": [
+    [
+      "verb",
+      "ListRecords"
+    ],
+    [
+      "metadataPrefix",
+      "arXiv"
+    ],
+    [
+      "set",
+      "cs"
+    ],
+    [
+      "from",
+      "2026-11-01"
+    ]
+  ],
+  "provider": "arxiv",
+  "raw_sha256": "f2c2f4effc244b3902ddf1396166691a7bce45b53cc0ca3e948a305b3438673a",
+  "recorded_at": "2026-11-03T20:58:52.554770+00:00"
+}

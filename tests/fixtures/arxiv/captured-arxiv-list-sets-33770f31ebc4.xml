@@ -1,0 +1,926 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2026-10-30T16:14:54Z</responseDate>
+            <request verb="ListSets">http://oaipmh.arxiv.org/oai</request>
+
+
+    <ListSets>
+                <set>
+        <setSpec>physics</setSpec>
+        <setName>Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>math</setSpec>
+        <setName>Mathematics</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio</setSpec>
+        <setName>Quantitative Biology</setName>
+    </set>
+
+                <set>
+        <setSpec>cs</setSpec>
+        <setName>Computer Science</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin</setSpec>
+        <setName>Quantitative Finance</setName>
+    </set>
+
+                <set>
+        <setSpec>stat</setSpec>
+        <setName>Statistics</setName>
+    </set>
+
+                <set>
+        <setSpec>eess</setSpec>
+        <setName>Electrical Engineering and Systems Science</setName>
+    </set>
+
+                <set>
+        <setSpec>econ</setSpec>
+        <setName>Economics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:astro-ph</setSpec>
+        <setName>Astrophysics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat</setSpec>
+        <setName>Condensed Matter</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs</setSpec>
+        <setName>Computer Science</setName>
+    </set>
+
+                <set>
+        <setSpec>econ:econ</setSpec>
+        <setName>Economics</setName>
+    </set>
+
+                <set>
+        <setSpec>eess:eess</setSpec>
+        <setName>Electrical Engineering and Systems Science</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:gr-qc</setSpec>
+        <setName>General Relativity and Quantum Cosmology</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-ex</setSpec>
+        <setName>High Energy Physics - Experiment</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-lat</setSpec>
+        <setName>High Energy Physics - Lattice</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-ph</setSpec>
+        <setName>High Energy Physics - Phenomenology</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-th</setSpec>
+        <setName>High Energy Physics - Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math</setSpec>
+        <setName>Mathematics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:math-ph</setSpec>
+        <setName>Mathematical Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nlin</setSpec>
+        <setName>Nonlinear Sciences</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nucl-ex</setSpec>
+        <setName>Nuclear Experiment</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nucl-th</setSpec>
+        <setName>Nuclear Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics</setSpec>
+        <setName>Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio</setSpec>
+        <setName>Quantitative Biology</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin</setSpec>
+        <setName>Quantitative Finance</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:quant-ph</setSpec>
+        <setName>Quantum Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>stat:stat</setSpec>
+        <setName>Statistics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:astro-ph:CO</setSpec>
+        <setName>Cosmology and Nongalactic Astrophysics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:astro-ph:EP</setSpec>
+        <setName>Earth and Planetary Astrophysics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:astro-ph:GA</setSpec>
+        <setName>Astrophysics of Galaxies</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:astro-ph:HE</setSpec>
+        <setName>High Energy Astrophysical Phenomena</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:astro-ph:IM</setSpec>
+        <setName>Instrumentation and Methods for Astrophysics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:astro-ph:SR</setSpec>
+        <setName>Solar and Stellar Astrophysics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:dis-nn</setSpec>
+        <setName>Disordered Systems and Neural Networks</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:mes-hall</setSpec>
+        <setName>Mesoscale and Nanoscale Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:mtrl-sci</setSpec>
+        <setName>Materials Science</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:other</setSpec>
+        <setName>Other Condensed Matter</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:quant-gas</setSpec>
+        <setName>Quantum Gases</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:soft</setSpec>
+        <setName>Soft Condensed Matter</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:stat-mech</setSpec>
+        <setName>Statistical Mechanics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:str-el</setSpec>
+        <setName>Strongly Correlated Electrons</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:cond-mat:supr-con</setSpec>
+        <setName>Superconductivity</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:AI</setSpec>
+        <setName>Artificial Intelligence</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:AR</setSpec>
+        <setName>Hardware Architecture</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:CC</setSpec>
+        <setName>Computational Complexity</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:CE</setSpec>
+        <setName>Computational Engineering, Finance, and Science</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:CG</setSpec>
+        <setName>Computational Geometry</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:CL</setSpec>
+        <setName>Computation and Language</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:CR</setSpec>
+        <setName>Cryptography and Security</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:CV</setSpec>
+        <setName>Computer Vision and Pattern Recognition</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:CY</setSpec>
+        <setName>Computers and Society</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:DB</setSpec>
+        <setName>Databases</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:DC</setSpec>
+        <setName>Distributed, Parallel, and Cluster Computing</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:DL</setSpec>
+        <setName>Digital Libraries</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:DM</setSpec>
+        <setName>Discrete Mathematics</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:DS</setSpec>
+        <setName>Data Structures and Algorithms</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:ET</setSpec>
+        <setName>Emerging Technologies</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:FL</setSpec>
+        <setName>Formal Languages and Automata Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:GL</setSpec>
+        <setName>General Literature</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:GR</setSpec>
+        <setName>Graphics</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:GT</setSpec>
+        <setName>Computer Science and Game Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:HC</setSpec>
+        <setName>Human-Computer Interaction</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:IR</setSpec>
+        <setName>Information Retrieval</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:IT</setSpec>
+        <setName>Information Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:LG</setSpec>
+        <setName>Machine Learning</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:LO</setSpec>
+        <setName>Logic in Computer Science</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:MA</setSpec>
+        <setName>Multiagent Systems</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:MM</setSpec>
+        <setName>Multimedia</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:MS</setSpec>
+        <setName>Mathematical Software</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:NA</setSpec>
+        <setName>Numerical Analysis</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:NE</setSpec>
+        <setName>Neural and Evolutionary Computing</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:NI</setSpec>
+        <setName>Networking and Internet Architecture</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:OH</setSpec>
+        <setName>Other Computer Science</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:OS</setSpec>
+        <setName>Operating Systems</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:PF</setSpec>
+        <setName>Performance</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:PL</setSpec>
+        <setName>Programming Languages</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:RO</setSpec>
+        <setName>Robotics</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:SC</setSpec>
+        <setName>Symbolic Computation</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:SD</setSpec>
+        <setName>Sound</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:SE</setSpec>
+        <setName>Software Engineering</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:SI</setSpec>
+        <setName>Social and Information Networks</setName>
+    </set>
+
+                <set>
+        <setSpec>cs:cs:SY</setSpec>
+        <setName>Systems and Control</setName>
+    </set>
+
+                <set>
+        <setSpec>econ:econ:EM</setSpec>
+        <setName>Econometrics</setName>
+    </set>
+
+                <set>
+        <setSpec>econ:econ:GN</setSpec>
+        <setName>General Economics</setName>
+    </set>
+
+                <set>
+        <setSpec>econ:econ:TH</setSpec>
+        <setName>Theoretical Economics</setName>
+    </set>
+
+                <set>
+        <setSpec>eess:eess:AS</setSpec>
+        <setName>Audio and Speech Processing</setName>
+    </set>
+
+                <set>
+        <setSpec>eess:eess:IV</setSpec>
+        <setName>Image and Video Processing</setName>
+    </set>
+
+                <set>
+        <setSpec>eess:eess:SP</setSpec>
+        <setName>Signal Processing</setName>
+    </set>
+
+                <set>
+        <setSpec>eess:eess:SY</setSpec>
+        <setName>Systems and Control</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:gr-qc</setSpec>
+        <setName>General Relativity and Quantum Cosmology</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-ex</setSpec>
+        <setName>High Energy Physics - Experiment</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-lat</setSpec>
+        <setName>High Energy Physics - Lattice</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-ph</setSpec>
+        <setName>High Energy Physics - Phenomenology</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:hep-th</setSpec>
+        <setName>High Energy Physics - Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:math-ph</setSpec>
+        <setName>Mathematical Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:AC</setSpec>
+        <setName>Commutative Algebra</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:AG</setSpec>
+        <setName>Algebraic Geometry</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:AP</setSpec>
+        <setName>Analysis of PDEs</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:AT</setSpec>
+        <setName>Algebraic Topology</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:CA</setSpec>
+        <setName>Classical Analysis and ODEs</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:CO</setSpec>
+        <setName>Combinatorics</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:CT</setSpec>
+        <setName>Category Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:CV</setSpec>
+        <setName>Complex Variables</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:DG</setSpec>
+        <setName>Differential Geometry</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:DS</setSpec>
+        <setName>Dynamical Systems</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:FA</setSpec>
+        <setName>Functional Analysis</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:GM</setSpec>
+        <setName>General Mathematics</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:GN</setSpec>
+        <setName>General Topology</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:GR</setSpec>
+        <setName>Group Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:GT</setSpec>
+        <setName>Geometric Topology</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:HO</setSpec>
+        <setName>History and Overview</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:IT</setSpec>
+        <setName>Information Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:KT</setSpec>
+        <setName>K-Theory and Homology</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:LO</setSpec>
+        <setName>Logic</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:MG</setSpec>
+        <setName>Metric Geometry</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:MP</setSpec>
+        <setName>Mathematical Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:NA</setSpec>
+        <setName>Numerical Analysis</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:NT</setSpec>
+        <setName>Number Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:OA</setSpec>
+        <setName>Operator Algebras</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:OC</setSpec>
+        <setName>Optimization and Control</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:PR</setSpec>
+        <setName>Probability</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:QA</setSpec>
+        <setName>Quantum Algebra</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:RA</setSpec>
+        <setName>Rings and Algebras</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:RT</setSpec>
+        <setName>Representation Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:SG</setSpec>
+        <setName>Symplectic Geometry</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:SP</setSpec>
+        <setName>Spectral Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>math:math:ST</setSpec>
+        <setName>Statistics Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nlin:AO</setSpec>
+        <setName>Adaptation and Self-Organizing Systems</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nlin:CD</setSpec>
+        <setName>Chaotic Dynamics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nlin:CG</setSpec>
+        <setName>Cellular Automata and Lattice Gases</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nlin:PS</setSpec>
+        <setName>Pattern Formation and Solitons</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nlin:SI</setSpec>
+        <setName>Exactly Solvable and Integrable Systems</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nucl-ex</setSpec>
+        <setName>Nuclear Experiment</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:nucl-th</setSpec>
+        <setName>Nuclear Theory</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:acc-ph</setSpec>
+        <setName>Accelerator Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:ao-ph</setSpec>
+        <setName>Atmospheric and Oceanic Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:app-ph</setSpec>
+        <setName>Applied Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:atm-clus</setSpec>
+        <setName>Atomic and Molecular Clusters</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:atom-ph</setSpec>
+        <setName>Atomic Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:bio-ph</setSpec>
+        <setName>Biological Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:chem-ph</setSpec>
+        <setName>Chemical Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:class-ph</setSpec>
+        <setName>Classical Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:comp-ph</setSpec>
+        <setName>Computational Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:data-an</setSpec>
+        <setName>Data Analysis, Statistics and Probability</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:ed-ph</setSpec>
+        <setName>Physics Education</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:flu-dyn</setSpec>
+        <setName>Fluid Dynamics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:gen-ph</setSpec>
+        <setName>General Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:geo-ph</setSpec>
+        <setName>Geophysics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:hist-ph</setSpec>
+        <setName>History and Philosophy of Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:ins-det</setSpec>
+        <setName>Instrumentation and Detectors</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:med-ph</setSpec>
+        <setName>Medical Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:optics</setSpec>
+        <setName>Optics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:plasm-ph</setSpec>
+        <setName>Plasma Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:pop-ph</setSpec>
+        <setName>Popular Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:soc-ph</setSpec>
+        <setName>Physics and Society</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:physics:space-ph</setSpec>
+        <setName>Space Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:BM</setSpec>
+        <setName>Biomolecules</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:CB</setSpec>
+        <setName>Cell Behavior</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:GN</setSpec>
+        <setName>Genomics</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:MN</setSpec>
+        <setName>Molecular Networks</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:NC</setSpec>
+        <setName>Neurons and Cognition</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:OT</setSpec>
+        <setName>Other Quantitative Biology</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:PE</setSpec>
+        <setName>Populations and Evolution</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:QM</setSpec>
+        <setName>Quantitative Methods</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:SC</setSpec>
+        <setName>Subcellular Processes</setName>
+    </set>
+
+                <set>
+        <setSpec>q-bio:q-bio:TO</setSpec>
+        <setName>Tissues and Organs</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:CP</setSpec>
+        <setName>Computational Finance</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:EC</setSpec>
+        <setName>Economics</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:GN</setSpec>
+        <setName>General Finance</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:MF</setSpec>
+        <setName>Mathematical Finance</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:PM</setSpec>
+        <setName>Portfolio Management</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:PR</setSpec>
+        <setName>Pricing of Securities</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:RM</setSpec>
+        <setName>Risk Management</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:ST</setSpec>
+        <setName>Statistical Finance</setName>
+    </set>
+
+                <set>
+        <setSpec>q-fin:q-fin:TR</setSpec>
+        <setName>Trading and Market Microstructure</setName>
+    </set>
+
+                <set>
+        <setSpec>physics:quant-ph</setSpec>
+        <setName>Quantum Physics</setName>
+    </set>
+
+                <set>
+        <setSpec>stat:stat:AP</setSpec>
+        <setName>Applications</setName>
+    </set>
+
+                <set>
+        <setSpec>stat:stat:CO</setSpec>
+        <setName>Computation</setName>
+    </set>
+
+                <set>
+        <setSpec>stat:stat:ME</setSpec>
+        <setName>Methodology</setName>
+    </set>
+
+                <set>
+        <setSpec>stat:stat:ML</setSpec>
+        <setName>Machine Learning</setName>
+    </set>
+
+                <set>
+        <setSpec>stat:stat:OT</setSpec>
+        <setName>Other Statistics</setName>
+    </set>
+
+                <set>
+        <setSpec>stat:stat:TH</setSpec>
+        <setName>Statistics Theory</setName>
+    </set>
+
+    </ListSets>
+</OAI-PMH>
