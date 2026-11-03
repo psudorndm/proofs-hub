@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "SourceSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "completed_watermark": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Completed Watermark"
+        },
+        "coverage_state": {
+          "title": "Coverage State",
+          "type": "string"
+        },
+        "last_attempt_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Attempt At"
+        },
+        "last_error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Error Code"
+        },
+        "last_success_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last Success At"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "streams": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Streams",
+          "type": "array"
+        }
+      },
+      "required": [
+        "provider",
+        "last_attempt_at",
+        "last_success_at",
+        "completed_watermark",
+        "last_error_code",
+        "coverage_state",
+        "streams"
+      ],
+      "title": "SourceSummary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "as_of_date": {
+      "title": "As Of Date",
+      "type": "string"
+    },
+    "available_years": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Available Years",
+      "type": "array"
+    },
+    "catalog_snapshot_at": {
+      "title": "Catalog Snapshot At",
+      "type": "string"
+    },
+    "code_revision": {
+      "title": "Code Revision",
+      "type": "string"
+    },
+    "coverage_status": {
+      "enum": [
+        "complete",
+        "partial",
+        "not_started"
+      ],
+      "title": "Coverage Status",
+      "type": "string"
+    },
+    "dataset_mode": {
+      "enum": [
+        "live",
+        "fixture"
+      ],
+      "title": "Dataset Mode",
+      "type": "string"
+    },
+    "generated_at": {
+      "title": "Generated At",
+      "type": "string"
+    },
+    "included_work_count": {
+      "title": "Included Work Count",
+      "type": "integer"
+    },
+    "page_size": {
+      "const": 25,
+      "default": 25,
+      "title": "Page Size",
+      "type": "integer"
+    },
+    "public_base_path": {
+      "title": "Public Base Path",
+      "type": "string"
+    },
+    "public_site_url": {
+      "title": "Public Site Url",
+      "type": "string"
+    },
+    "release_id": {
+      "title": "Release Id",
+      "type": "string"
+    },
+    "rules_version": {
+      "title": "Rules Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "site_description": {
+      "title": "Site Description",
+      "type": "string"
+    },
+    "site_title": {
+      "title": "Site Title",
+      "type": "string"
+    },
+    "source_config_hash": {
+      "title": "Source Config Hash",
+      "type": "string"
+    },
+    "source_record_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Source Record Counts",
+      "type": "object"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/SourceSummary"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "topic_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Topic Counts",
+      "type": "object"
+    }
+  },
+  "required": [
+    "release_id",
+    "dataset_mode",
+    "generated_at",
+    "catalog_snapshot_at",
+    "code_revision",
+    "rules_version",
+    "source_config_hash",
+    "included_work_count",
+    "source_record_counts",
+    "sources",
+    "available_years",
+    "topic_counts",
+    "coverage_status",
+    "public_base_path",
+    "as_of_date",
+    "site_title",
+    "site_description",
+    "public_site_url"
+  ],
+  "title": "Manifest",
+  "type": "object"
+}

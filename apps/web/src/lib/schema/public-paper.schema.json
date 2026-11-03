@@ -1,0 +1,571 @@
+{
+  "$defs": {
+    "PartialDate": {
+      "additionalProperties": false,
+      "properties": {
+        "day": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Day"
+        },
+        "month": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Month"
+        },
+        "precision": {
+          "enum": [
+            "day",
+            "month",
+            "year",
+            "unknown"
+          ],
+          "title": "Precision",
+          "type": "string"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Year"
+        }
+      },
+      "required": [
+        "year",
+        "month",
+        "day",
+        "precision"
+      ],
+      "title": "PartialDate",
+      "type": "object"
+    },
+    "PublicAuthor": {
+      "additionalProperties": false,
+      "properties": {
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "orcid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Orcid"
+        }
+      },
+      "required": [
+        "display_name",
+        "orcid"
+      ],
+      "title": "PublicAuthor",
+      "type": "object"
+    },
+    "PublicCodeLink": {
+      "additionalProperties": false,
+      "properties": {
+        "origin": {
+          "title": "Origin",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "verified_official": {
+          "title": "Verified Official",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "url",
+        "origin",
+        "verified_official"
+      ],
+      "title": "PublicCodeLink",
+      "type": "object"
+    },
+    "PublicEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Date"
+        },
+        "date_basis": {
+          "enum": [
+            "source",
+            "observed",
+            "none"
+          ],
+          "title": "Date Basis",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source"
+        }
+      },
+      "required": [
+        "kind",
+        "date",
+        "date_basis",
+        "source"
+      ],
+      "title": "PublicEvent",
+      "type": "object"
+    },
+    "PublicEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "rule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rule Id"
+        },
+        "snippet": {
+          "title": "Snippet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "snippet",
+        "rule_id"
+      ],
+      "title": "PublicEvidence",
+      "type": "object"
+    },
+    "PublicInclusion": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/PublicEvidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "review_status": {
+          "enum": [
+            "automatic",
+            "agent-provisional",
+            "human-reviewed"
+          ],
+          "title": "Review Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "review_status",
+        "explanation",
+        "evidence"
+      ],
+      "title": "PublicInclusion",
+      "type": "object"
+    },
+    "PublicPublication": {
+      "additionalProperties": false,
+      "properties": {
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Doi"
+        },
+        "venue_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Venue Key"
+        },
+        "venue_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Venue Name"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Year"
+        }
+      },
+      "required": [
+        "venue_key",
+        "venue_name",
+        "year",
+        "doi"
+      ],
+      "title": "PublicPublication",
+      "type": "object"
+    },
+    "PublicSource": {
+      "additionalProperties": false,
+      "properties": {
+        "landing_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Landing Url"
+        },
+        "pdf_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pdf Url"
+        },
+        "provider": {
+          "enum": [
+            "eprint",
+            "arxiv",
+            "dblp",
+            "crossref",
+            "curated"
+          ],
+          "title": "Provider",
+          "type": "string"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "withdrawn",
+            "deleted"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Version"
+        }
+      },
+      "required": [
+        "provider",
+        "source_id",
+        "landing_url",
+        "pdf_url",
+        "version",
+        "status"
+      ],
+      "title": "PublicSource",
+      "type": "object"
+    },
+    "PublicUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "date_basis": {
+          "enum": [
+            "source",
+            "observed"
+          ],
+          "title": "Date Basis",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "source_revision",
+            "metadata_updated",
+            "withdrawn",
+            "restored"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_record_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Record Id"
+        }
+      },
+      "required": [
+        "kind",
+        "date",
+        "date_basis",
+        "source_record_id"
+      ],
+      "title": "PublicUpdate",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "abstract": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Abstract"
+    },
+    "areas": {
+      "items": {
+        "enum": [
+          "proof-systems",
+          "security-proofs",
+          "formal-verification"
+        ],
+        "type": "string"
+      },
+      "title": "Areas",
+      "type": "array"
+    },
+    "authors": {
+      "items": {
+        "$ref": "#/$defs/PublicAuthor"
+      },
+      "title": "Authors",
+      "type": "array"
+    },
+    "bibtex_path": {
+      "title": "Bibtex Path",
+      "type": "string"
+    },
+    "canonical_path": {
+      "title": "Canonical Path",
+      "type": "string"
+    },
+    "code_links": {
+      "items": {
+        "$ref": "#/$defs/PublicCodeLink"
+      },
+      "title": "Code Links",
+      "type": "array"
+    },
+    "contributions": {
+      "items": {
+        "enum": [
+          "construction-theory",
+          "analysis-attack",
+          "implementation-optimization",
+          "application",
+          "survey-tutorial"
+        ],
+        "type": "string"
+      },
+      "title": "Contributions",
+      "type": "array"
+    },
+    "foundational": {
+      "title": "Foundational",
+      "type": "boolean"
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/PublicEvent"
+      },
+      "title": "History",
+      "type": "array"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "inclusion": {
+      "$ref": "#/$defs/PublicInclusion"
+    },
+    "latest_update": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PublicUpdate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "metadata_issues": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Metadata Issues",
+      "type": "array"
+    },
+    "publications": {
+      "items": {
+        "$ref": "#/$defs/PublicPublication"
+      },
+      "title": "Publications",
+      "type": "array"
+    },
+    "published": {
+      "$ref": "#/$defs/PartialDate"
+    },
+    "related_work_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Related Work Ids",
+      "type": "array"
+    },
+    "release_id": {
+      "title": "Release Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/PublicSource"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "withdrawn",
+        "unavailable"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "topics": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Topics",
+      "type": "array"
+    }
+  },
+  "required": [
+    "release_id",
+    "id",
+    "title",
+    "authors",
+    "abstract",
+    "published",
+    "areas",
+    "topics",
+    "contributions",
+    "foundational",
+    "status",
+    "metadata_issues",
+    "sources",
+    "publications",
+    "code_links",
+    "latest_update",
+    "inclusion",
+    "related_work_ids",
+    "canonical_path",
+    "bibtex_path"
+  ],
+  "title": "PublicPaper",
+  "type": "object"
+}

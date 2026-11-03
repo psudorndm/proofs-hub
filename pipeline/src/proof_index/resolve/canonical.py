@@ -315,8 +315,13 @@ def build_canonical(
     )
     provenance = "automatic"
     evidence: list[InclusionEvidence] = []
+    seen_evidence: set[tuple[str, str, str]] = set()
     for m in labelled:
         for hit in m.classification.evidence.get("matched_rules", []):
+            marker = (hit["field"], hit["snippet"], hit["rule_id"])
+            if marker in seen_evidence:
+                continue
+            seen_evidence.add(marker)
             if hit["evidence_group"] in AREA_GROUPS and len(evidence) < 8:
                 evidence.append(
                     InclusionEvidence(

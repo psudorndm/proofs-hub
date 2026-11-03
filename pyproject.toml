@@ -62,6 +62,7 @@ ignore = ["S101"]
 "db/migrations/**" = ["E501", "S608"]
 "pipeline/src/proof_index/cli.py" = ["B008"]
 "scripts/build_synthetic_cases.py" = ["E501"]
+"tests/**/*.py" = ["S", "DTZ", "E501"]
 
 [tool.mypy]
 python_version = "3.12"

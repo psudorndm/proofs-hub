@@ -207,3 +207,29 @@ only adds load and delay.
   label change produces a new audited command and an unchanged file is a no-op.
 - The venue registry (`config/venues.yaml`) is agent-compiled and its DBLP prefixes
   are unverified until a real dump is processed.
+
+## D014 — Release export details (T11)
+
+- **Public catalog = included, live works.** Works under `review` or `excluded`
+  are not published; merged works appear only in `aliases.json`.
+- **Static lists:** New = active works with a day-precision publication date
+  0–29 days before the release's as-of date; Updated = active works whose latest
+  qualifying update event (source revision, metadata update, withdrawal,
+  restoration) falls in the same 30-day window. Archive pages are per publication
+  year (`unknown` last), Foundations and topic lists cover all dates. Withdrawn and
+  unavailable works keep detail pages but are left out of these default lists.
+- **Feeds** use the same windows as the lists (at most 100 entries each) so a feed
+  reader never receives historical discoveries as new. New entry IDs are tag URIs
+  of the work ID; Updated entry IDs hash the event key.
+- **Additive public fields** (schema v1): `PublicPaper.history`; `PaperCard`
+  (`json_path`, `has_abstract`, `has_code`, `venue`, `doi`); list pages carry
+  `list`, `page_count`, `as_of_date`, `window_days`; the manifest also carries
+  `as_of_date`, `site_title`, `site_description`, `public_site_url`.
+- **Derived landing URLs** (D008) use ePrint's zero-padded display form
+  (`2021/042`); BibTeX notes use the same form.
+- **Card JSON paths** point at `<base>assets/releases/<release-id>/papers/<id>.json`,
+  the versioned asset location of spec 16.1.
+- **Ranks and date tokens** for Pagefind live in `search-facets.json` (per-paper
+  `rank_newest/oldest/updated`, `publication_period`, `update_period`, identifiers).
+- The export writes into a temporary sibling directory and renames it into place;
+  an existing release directory is never overwritten.

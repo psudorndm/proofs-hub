@@ -1,0 +1,8 @@
+# Public site identity. Do not invent an affiliation; leave optional fields null.
+title: Cryptographic Proofs Research Index
+description: >-
+  A research index of cryptographic proof systems, security proofs, formal
+  verification, and cryptographic protocol analysis, with full historical coverage.
+scope_line: Proof systems, security proofs, and formal verification
+maintainer_label: null
+contact: null

@@ -458,6 +458,91 @@ def review_export(out: Path = typer.Option(Path("work/review.jsonl"), "--out")) 
     emit({"command": "review export", "out": str(out), **counts}, True)
 
 
+release_app = typer.Typer(help="Export and validate public releases.", no_args_is_help=True)
+app.add_typer(release_app, name="release")
+
+
+@release_app.command("export")
+@handle_errors
+def release_export(
+    out: Path | None = typer.Option(None, "--out", help="New release directory (must not exist)."),
+    dataset_mode: str = typer.Option("live", "--dataset-mode", help="live or fixture"),
+) -> None:
+    """Export a release from a consistent catalog snapshot (blocked by pending promotions)."""
+    from proof_index.config.site import load_site
+    from proof_index.errors import InputError
+    from proof_index.ingest.service import Pipeline, classification_hook
+    from proof_index.models.classification import load_taxonomy
+    from proof_index.publish.export import export_release
+
+    if dataset_mode not in ("live", "fixture"):
+        raise InputError("--dataset-mode must be live or fixture")
+    settings = load_settings()
+    pipeline = Pipeline.from_settings(settings)
+    if out is None:
+        stamp = pipeline.clock.now().strftime("%Y%m%dT%H%M%SZ")
+        out = settings.export_root / f"{stamp}-{dataset_mode}"
+    result = export_release(
+        pipeline.engine,
+        out,
+        clock=pipeline.clock,
+        site=load_site(settings.site_config),
+        sources=pipeline.config,
+        taxonomy=load_taxonomy(Path("config/taxonomy.yaml")),
+        rules_version=classification_hook(pipeline).classifier.version,
+        public_site_url=settings.public_site_url,
+        base_path=settings.public_base_path,
+        dataset_mode=dataset_mode,
+    )
+    m = result.manifest
+    emit(
+        {
+            "command": "release export",
+            "release_id": result.release_id,
+            "path": str(result.path),
+            "dataset_mode": m["dataset_mode"],
+            "included_work_count": m["included_work_count"],
+            "coverage_status": m["coverage_status"],
+        },
+        True,
+    )
+
+
+@release_app.command("validate")
+@handle_errors
+def release_validate(
+    path: Path = typer.Argument(...),
+    require_live: bool = typer.Option(False, "--require-live", help="Deployment guard."),
+) -> None:
+    """Validate an exported release directory (schema, counts, checksums, secrets)."""
+    from proof_index.publish.validate import validate_release
+
+    report = validate_release(path, require_live=require_live)
+    settings = load_settings()
+    if settings.database_url:
+        from sqlalchemy import update
+
+        from proof_index.db import tables as t
+        from proof_index.db.repository import make_engine, transaction
+
+        engine = make_engine(settings.database_url)
+        try:
+            with transaction(engine) as conn:
+                conn.execute(
+                    update(t.releases)
+                    .where(t.releases.c.release_key == report["release_id"])
+                    .where(t.releases.c.state == "exported")
+                    .values(state="validated")
+                )
+        except Exception as exc:  # noqa: BLE001 - validation result stands without the DB
+            typer.echo(
+                f"note: release state not recorded in the database ({type(exc).__name__})", err=True
+            )
+        finally:
+            engine.dispose()
+    emit(report, True)
+
+
 @app.callback()
 def _root(
     version: bool = typer.Option(False, "--version", help="Print the version and exit."),

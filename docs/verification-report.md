@@ -260,3 +260,26 @@ its stored DOI list. Curated: included + foundational + agent-provisional labels
 idempotent re-import, corrected title keeps the stable slug and work ID, schema
 example and invalid lines rejected before staging, identifiers join an existing work.
 No real DBLP dump, Crossref response, or verified foundational entry was used.
+
+## T11 — Release export and schema contract (2026-11-03)
+
+```text
+$ make test-db                 -> 278 passed (12 release tests + 3 BibTeX unit tests)
+$ uv run ruff check; uv run mypy (72 files) -> clean
+$ make fixture-export          -> work/releases/fixture-preview, 9 papers, validated
+$ uv run python scripts/validate-release.py work/releases/fixture-preview --require-live
+    error[data_validation_failure]: ... live deployment guard: release is a fixture dataset
+$ make schema                  -> apps/web/src/lib/schema/{public-paper,paper-card,list-page,manifest}.schema.json
+```
+
+The fixture release is built by pushing the synthetic cases through the real
+promotion/classification/identity/event/curation code in a disposable
+`proofs_fixture_*` database, then exported with `dataset_mode=fixture`.
+Tests: counts and manifest consistency; `test_fixture_release_is_rejected_by_live_deploy_guard`;
+list semantics (F13 New, F14 archived not New, F12 in `archive/unknown`, F09 in
+Foundations, F01–F03 once, empty topic lists valid); unique ranks with unknown dates
+last both ways; withdrawn source with active counterpart; `test_untrusted_title_and_link_are_safe`;
+`test_public_export_excludes_internal_secrets_and_error_traces`; checksum tampering
+and forbidden keys detected; `test_new_and_updated_feeds_have_stable_unique_ids`;
+no overwrite of an existing release; `test_partial_promotion_blocks_export`; non-root
+base path in canonical/JSON/feed URLs; `test_bibtex_escapes_special_characters_and_preserves_author_order`.

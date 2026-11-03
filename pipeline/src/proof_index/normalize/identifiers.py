@@ -30,6 +30,12 @@ def normalize_eprint_id(value: str) -> str | None:
     return f"{year}/{num}"
 
 
+def eprint_display_id(source_id: str) -> str:
+    """ePrint's display form with at least three digits (``2021/42`` -> ``2021/042``)."""
+    year, _, number = source_id.partition("/")
+    return f"{year}/{int(number):03d}"
+
+
 # --- arXiv -------------------------------------------------------------------
 
 
