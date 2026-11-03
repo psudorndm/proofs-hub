@@ -83,3 +83,21 @@ Covered: the full section 12 calendar table at 2026-11-03 (`test_spec_calendar_t
 prefix stripping, unsafe links (`javascript:`, embedded credentials, missing host),
 empty-title rejection, absent authors/abstract allowed, whitespace-invariant content
 hash, set-vs-ordered hash fields, and taxonomy closed-vocabulary validation.
+
+## T03 — Database migrations and repository (2026-11-03)
+
+```text
+$ make migrate                 -> alembic upgrade head (revision 0001) on local PostgreSQL 17.11
+$ make test-db                 -> 113 passed (12 PostgreSQL integration tests + unit tests)
+$ uv run ruff check; uv run mypy -> clean
+```
+
+Integration tests create a migrated template database `proofs_test_tmpl_*` and a
+fresh `proofs_test_*` copy per test; they never use `DATABASE_URL`. Covered:
+migrate empty database -> downgrade base -> upgrade again; metadata/migration drift
+check (it caught a `use_alter` FK that `op.create_table` silently skipped, now fixed);
+FK enforcement; UNIQUE(source, source_id); composite FK rejecting a current
+observation that belongs to another record; CHECK constraints (visibility,
+self-merge, terminal page with cursor, paused-without-phase); sorted/distinct
+separation pairs; immutable curation rows (UPDATE and DELETE rejected by trigger);
+no cascading delete; full rollback of a failing transaction.

@@ -57,3 +57,33 @@ Links are hashed as a set sorted by (kind, url); authors keep their order.
 DOIs are case-insensitive. `normalize_doi` strips URL/`doi:` prefixes and
 whitespace and lower-cases the result; the original provider string remains in
 the stored raw response.
+
+## D006 — Additive database columns and one additive table (T03)
+
+Section 6 lists minimum columns; these additions support behavior the spec
+requires elsewhere and change no listed meaning:
+
+- `provider_streams.checkpoint jsonb`, `created_at` — stream checkpoint data
+  (e.g. the incremental boundary captured before a bootstrap, section 8).
+- `harvest_runs.config_hash`, `paused_phase`, `snapshot_key`, `promotion_started_at`,
+  `reconciled_at`, `records_quarantined`, `reported_total` — resumable phase, DBLP
+  dump fingerprint (section 7), and the durable *pending promotion* marker that
+  blocks export after a crash (section 8): a run with `promotion_started_at` set,
+  not `succeeded`, and not `reconciled_at` blocks release export.
+- `harvest_pages.quarantined_count`, `reported_total`, `fetched_at`; CHECK
+  `is_terminal = (next_cursor IS NULL)` enforces "terminal agrees with cursor absence".
+- `staged_records.item_ordinal` — stable promotion order within a page.
+- `source_observations.item_kind`, `parser_version`, `previous_observation_id`.
+- `curation_commands.command_id` (UNIQUE) — the YAML command id; plus an
+  `import_curated` kind for the curated foundational import. An UPDATE/DELETE
+  trigger makes rows immutable.
+- `work_events.curation_command_id`, `source_record_id`, `details`; `date_basis`
+  allows `none` (exactly when `event_date` is NULL).
+- `publications.source_record_id`, `releases.release_key`, `classifications.created_at`,
+  `coverage_slices.updated_at` (coverage `run_id` is nullable for `not_started` slices).
+- New table `quarantine_items` for item-level parse failures that have no valid
+  source identity (which `staged_records.source_id NOT NULL` cannot hold).
+
+Nullable JSONB columns use `none_as_null=True` so Python `None` is SQL NULL, not
+JSON `null`. A test (`test_migration_matches_table_metadata`) fails if the Alembic
+migration and the Core metadata drift apart.
